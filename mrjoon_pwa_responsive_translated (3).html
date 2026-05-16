@@ -1,0 +1,2748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0b12">
+<title>MrJoon.am</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#0040ff;--blue-lt:rgba(0,64,255,.15);
+  --green:#00c986;--green-lt:rgba(0,201,134,.15);
+  --orange:#ff6b00;--orange-lt:rgba(255,107,0,.15);
+  --gold:#ffaa00;--bg:#0a0b12;--card:#111318;--card2:#16181f;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --txt:#fff;--txt2:rgba(255,255,255,.5);--txt3:rgba(255,255,255,.28);
+  --font-display:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  display: block;
+  position: fixed;
+  inset: 0;
+}
+
+/* ─── APP SHELL: full viewport ─── */
+#app-shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ─── SCREENS CONTAINER ─── */
+.screen-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Each screen */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--font-body);
+  background: var(--bg);
+}
+.screen.hidden { display: none; }
+
+/* Slide transition */
+.screen.slide-enter { animation: slideIn .28s cubic-bezier(.25,.46,.45,.94) forwards; }
+.screen.slide-enter-back { animation: slideInBack .28s cubic-bezier(.25,.46,.45,.94) forwards; }
+@keyframes slideIn { from{transform:translateX(100%);opacity:.6} to{transform:translateX(0);opacity:1} }
+@keyframes slideInBack { from{transform:translateX(-30%);opacity:.6} to{transform:translateX(0);opacity:1} }
+.screen.fade-enter { animation: fadeIn .22s ease forwards; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(60px + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: rgba(10,11,18,.97);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  padding-top: 10px;
+  z-index: 50;
+}
+.bnav-item { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform .15s;padding:4px 8px;border-radius:12px;position:relative; }
+.bnav-item:active { transform:scale(.9); }
+.bnav-item i { font-size:22px;color:var(--txt3); }
+.bnav-item.active i { color:var(--blue); }
+.bnav-label { font-size:10px;color:var(--txt3);font-weight:500; }
+.bnav-item.active .bnav-label { color:var(--blue); }
+.bnav-badge { position:absolute;top:0;right:2px;width:8px;height:8px;border-radius:50%;background:#ff3b30;border:1.5px solid #000; }
+
+/* ─── SAFE AREA HELPERS ─── */
+.safe-top-pad { padding-top: calc(var(--safe-top) + 16px); }
+.pt-safe { padding-top: var(--safe-top); }
+.pb-nav { padding-bottom: calc(60px + var(--safe-bottom) + 16px); }
+
+/* ═══ INTRO ═══ */
+#screen-intro { background:var(--bg); }
+.intro-bg { position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 30% 20%,rgba(0,64,255,.25) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(0,201,134,.12) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 70% 10%,rgba(0,64,255,.08) 0%,transparent 70%);animation:blobPulse 8s ease-in-out infinite alternate; }
+@keyframes blobPulse { 0%{opacity:.7}100%{opacity:1} }
+.intro-grid { position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 49px,rgba(255,255,255,.025) 50px),repeating-linear-gradient(90deg,transparent,transparent 49px,rgba(255,255,255,.025) 50px); }
+.intro-content { position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:calc(var(--safe-top) + 52px);padding-left:24px;padding-right:24px;padding-bottom:calc(var(--safe-bottom) + 24px);height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch; }
+.intro-content::-webkit-scrollbar { display:none; }
+.intro-logo-mark { width:80px;height:80px;border-radius:24px;background:var(--blue);display:flex;align-items:center;justify-content:center;margin-bottom:24px;box-shadow:0 0 60px rgba(0,64,255,.5),0 0 120px rgba(0,64,255,.2);animation:floatLogo 4s ease-in-out infinite;position:relative;overflow:hidden; }
+.intro-logo-mark::before { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,transparent 60%); }
+@keyframes floatLogo { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
+.intro-wordmark { font-family:var(--font-display);font-size:40px;font-weight:800;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:8px; }
+.intro-wordmark span { color:var(--blue); }
+.intro-tagline { font-size:14px;color:var(--txt2);font-weight:400;line-height:1.6;margin-bottom:28px;max-width:280px; }
+.intro-pills { display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px; }
+.intro-pill { display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:30px;border:1px solid var(--border2);background:rgba(255,255,255,.05);font-size:12px;font-weight:600;color:var(--txt2); }
+.intro-pill i { font-size:14px; }
+.intro-pill.blue { border-color:rgba(0,64,255,.4);color:#6699ff;background:rgba(0,64,255,.12); }
+.intro-pill.green { border-color:rgba(0,201,134,.3);color:#00c986;background:rgba(0,201,134,.1); }
+.intro-pill.orange { border-color:rgba(255,107,0,.3);color:#ff8c42;background:rgba(255,107,0,.1); }
+.intro-actions { display:flex;flex-direction:column;gap:10px;width:100%; }
+.btn-primary { width:100%;height:52px;border-radius:18px;background:var(--blue);border:none;cursor:pointer;font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;box-shadow:0 8px 32px rgba(0,64,255,.4); }
+.btn-primary:active { transform:scale(.97); }
+.btn-secondary { width:100%;height:52px;border-radius:18px;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);cursor:pointer;font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,background .15s; }
+.btn-secondary:active { transform:scale(.97); }
+.intro-note { margin-top:12px;font-size:12px;color:var(--txt3); }
+.intro-note a { color:var(--blue);text-decoration:none;cursor:pointer; }
+
+/* ═══ AUTH ═══ */
+#screen-auth { background:#0d0e14;overflow:hidden; }
+.auth-hero { height:200px;background:var(--blue);position:relative;overflow:hidden;flex-shrink:0; }
+.auth-hero-blob { position:absolute;border-radius:50%;background:rgba(255,255,255,.06); }
+.auth-hero-grid { position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(255,255,255,.04) 30px),repeating-linear-gradient(90deg,transparent,transparent 29px,rgba(255,255,255,.04) 30px); }
+.auth-logo { position:absolute;bottom:16px;left:20px;font-family:var(--font-display);font-size:28px;font-weight:800;color:#fff;letter-spacing:-1.5px; }
+.auth-logo span { opacity:.5; }
+.auth-back { position:absolute;top:calc(var(--safe-top) + 14px);left:16px;z-index:10;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.3);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.15);cursor:pointer; }
+.auth-back i { color:#fff;font-size:18px; }
+.auth-body { padding:20px 20px calc(var(--safe-bottom) + 40px);overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100% - 200px); }
+.auth-body::-webkit-scrollbar { display:none; }
+.auth-body h2 { font-family:var(--font-display);font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-.5px; }
+.auth-body p { font-size:13px;color:var(--txt2);margin-bottom:20px;line-height:1.6; }
+.role-cards { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px; }
+.rc { border:2px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 10px;text-align:center;cursor:pointer;background:rgba(255,255,255,.03);transition:all .2s; }
+.rc.sel { border-color:var(--blue);background:var(--blue-lt); }
+.rc-icon { font-size:26px;margin-bottom:6px; }
+.rc-name { font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;font-family:var(--font-display); }
+.rc-desc { font-size:10px;color:var(--txt3); }
+.input-group { margin-bottom:10px;position:relative; }
+.input-field { width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 16px 13px 44px;font-size:14px;color:#fff;font-family:var(--font-body);outline:none;transition:border .2s;-webkit-appearance:none; }
+.input-field::placeholder { color:var(--txt3); }
+.input-field:focus { border-color:rgba(0,64,255,.5);background:rgba(0,64,255,.05); }
+.input-field.err { border-color:rgba(255,59,48,.6);background:rgba(255,59,48,.05); }
+.input-icon { position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--txt3);pointer-events:none; }
+.input-eye { position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--txt3);cursor:pointer; }
+.field-err { font-size:11px;color:#ff3b30;margin-top:-7px;margin-bottom:8px;padding-left:4px;display:none; }
+.field-err.show { display:block; }
+.pass-strength { display:flex;gap:3px;margin-top:4px;margin-bottom:8px; }
+.ps-bar { height:3px;border-radius:2px;flex:1;background:rgba(255,255,255,.08);transition:background .3s; }
+.ps-bar.weak{background:#ff3b30;}.ps-bar.med{background:#ffaa00;}.ps-bar.strong{background:#00c986;}
+.ps-label { font-size:10px;margin-top:2px;margin-bottom:4px;padding-left:2px; }
+.big-btn { width:100%;height:50px;border-radius:16px;background:var(--blue);border:none;cursor:pointer;font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 24px rgba(0,64,255,.35); }
+.big-btn:active { transform:scale(.97); }
+.auth-switch { text-align:center;font-size:13px;color:var(--txt3);margin-top:12px; }
+.auth-switch a { color:#4d7fff;font-weight:600;cursor:pointer;text-decoration:none; }
+.divider-row { display:flex;align-items:center;gap:10px;margin:14px 0; }
+.divider-line { flex:1;height:1px;background:var(--border); }
+.divider-txt { font-size:12px;color:var(--txt3); }
+.social-btns { display:flex;gap:10px;margin-bottom:4px; }
+.social-btn { flex:1;height:42px;border-radius:14px;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;transition:background .15s; }
+.auth-tabs { display:flex;gap:0;margin-bottom:18px;background:rgba(255,255,255,.06);border-radius:14px;padding:4px; }
+.auth-tab { flex:1;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--txt3);cursor:pointer;transition:all .2s;font-family:var(--font-display); }
+.auth-tab.active { background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(0,64,255,.3); }
+
+/* ═══ MAP ═══ */
+#screen-map { background:#1a1e2e; }
+#mapbox-container { position:absolute;inset:0;z-index:0; }
+.mapboxgl-map { width:100% !important; height:100% !important; }
+.mapboxgl-popup-content { background:#111318; color:#fff; border-radius:12px; padding:12px 14px; border:1px solid rgba(255,255,255,.1); }
+.mapboxgl-popup-content h3 { margin:0 0 4px; font-family:var(--font-display); font-size:14px; }
+.mapboxgl-popup-close-button { color:#fff; font-size:18px; }
+.mapboxgl-ctrl-group { background:#111318 !important; border:1px solid rgba(255,255,255,.1) !important; }
+.mapboxgl-ctrl-group button { background:#111318 !important; }
+.mapboxgl-ctrl-group button span { filter:invert(1); }
+.ant-marker { background-image:url('https://atyqxqtkfusskyifxawi.supabase.co/storage/v1/object/public/nkar/logo-removebg-preview.png'); background-size:contain; background-repeat:no-repeat; background-position:center; width:72px; height:72px; cursor:pointer; }
+button.delete-btn { background:#e74c3c; color:#fff; border:none; padding:5px 10px; cursor:pointer; border-radius:6px; margin-top:8px; font-size:12px; }
+button.delete-btn:hover { background:#c0392b; }
+.map-header { position:absolute;top:calc(var(--safe-top) + 12px);left:0;right:0;padding:0 16px;z-index:20; }
+.search-pill { display:flex;align-items:center;gap:10px;background:rgba(17,19,24,.88);border:1px solid var(--border2);border-radius:14px;padding:12px 14px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);cursor:pointer;transition:border-color .2s; }
+.search-pill:hover { border-color:rgba(0,64,255,.4); }
+.search-pill span { color:var(--txt3);font-size:13px;flex:1; }
+.s-ic { color:var(--txt3);font-size:16px; }
+.filter-chips { display:flex;gap:7px;margin-top:10px;overflow:hidden; }
+.fc { padding:6px 13px;border-radius:30px;font-size:11px;font-weight:700;border:1.5px solid rgba(255,255,255,.12);color:var(--txt3);white-space:nowrap;background:rgba(17,19,24,.7);cursor:pointer;transition:all .2s;font-family:var(--font-display); }
+.fc.on-j{background:var(--blue);border-color:var(--blue);color:#fff;}
+.fc.on-v{background:var(--green);border-color:var(--green);color:#fff;}
+.fc.on-a{background:var(--orange);border-color:var(--orange);color:#fff;}
+.bottom-sheet { position:absolute;bottom:calc(60px + var(--safe-bottom));left:0;right:0;background:#111318;border-radius:24px 24px 0 0;border-top:1px solid var(--border);padding:0;z-index:30;max-height:28%;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(42%);transition:transform .3s ease; }
+.bottom-sheet::-webkit-scrollbar { display:none; }
+.sheet-handle { width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:10px auto 14px; }
+.listing-row { display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s; }
+.listing-row:hover { background:rgba(255,255,255,.03); }
+.lr-icon { width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0; }
+.lr-icon.j{background:rgba(0,64,255,.18);}
+.lr-icon.v{background:rgba(0,201,134,.15);}
+.lr-icon.a{background:rgba(255,107,0,.15);}
+.lr-title { font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;font-family:var(--font-display); }
+.lr-sub { font-size:11px;color:var(--txt2); }
+.lr-right { margin-left:auto;text-align:right; }
+.lr-dist { font-size:11px;font-weight:700;color:var(--blue);background:rgba(0,64,255,.15);padding:3px 8px;border-radius:20px;font-family:var(--font-display); }
+.lr-pay { font-size:11px;color:var(--txt3);margin-top:3px; }
+
+/* ═══ DETAIL ═══ */
+#screen-detail { background:#0d0e14;overflow-y:auto;-webkit-overflow-scrolling:touch; }
+#screen-detail::-webkit-scrollbar { display:none; }
+.detail-map-thumb { width:100%;height:220px;background:#1c2035;position:relative;overflow:hidden;flex-shrink:0; }
+.detail-back { position:absolute;top:calc(var(--safe-top) + 14px);left:16px;z-index:10;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.12);cursor:pointer; }
+.detail-back i { color:#fff;font-size:18px; }
+.detail-card { background:#111318;border-radius:24px 24px 0 0;margin-top:-20px;position:relative;padding:20px 20px 120px; }
+.detail-chip { display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;background:rgba(0,64,255,.18);color:#4d7fff;font-size:11px;font-weight:700;margin-bottom:12px;font-family:var(--font-display); }
+.detail-title { font-family:var(--font-display);font-size:24px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:6px;letter-spacing:-.5px; }
+.detail-org { font-size:14px;color:var(--txt2);margin-bottom:16px; }
+.detail-meta-row { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px; }
+.dmeta { display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:7px 11px; }
+.dmeta i { font-size:14px;color:var(--txt2); }
+.dmeta span { font-size:12px;color:var(--txt2);font-weight:500; }
+.detail-divider { height:1px;background:var(--border);margin:16px 0; }
+.detail-section-label { font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;font-family:var(--font-display); }
+.trust-row { display:flex;align-items:center;gap:10px;margin-bottom:14px; }
+.trust-av { width:38px;height:38px;border-radius:50%;background:rgba(0,64,255,.2);display:flex;align-items:center;justify-content:center; }
+.trust-av i { font-size:20px;color:#4d7fff; }
+.trust-score { font-family:var(--font-display);font-size:26px;font-weight:800;color:#fff; }
+.trust-badge { display:flex;gap:5px;flex-wrap:wrap;margin-top:6px; }
+.tbadge { font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;font-family:var(--font-display); }
+.tbadge-v{background:rgba(0,201,134,.15);color:var(--green);}
+.tbadge-b{background:rgba(0,64,255,.15);color:#4d7fff;}
+.apply-bar { position:fixed;bottom:0;left:0;right:0;padding:12px 20px;padding-bottom:calc(var(--safe-bottom) + 12px);background:rgba(10,11,18,.97);border-top:1px solid var(--border);display:flex;gap:10px;z-index:40; }
+.apply-save { width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:background .15s; }
+.apply-save i { font-size:22px;color:var(--txt2); }
+.apply-btn { flex:1;height:48px;border-radius:14px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(0,64,255,.35); }
+.apply-btn:active { transform:scale(.97); }
+/* Comments */
+.comments-section { margin-top:0; }
+.comment-input-row { display:flex;gap:8px;margin-bottom:14px; }
+.comment-av-sm { width:30px;height:30px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.comment-av-sm i { font-size:15px;color:#fff; }
+.comment-input-wrap { flex:1;position:relative; }
+.comment-inp { width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);border-radius:12px;padding:9px 40px 9px 12px;font-size:12px;color:#fff;font-family:var(--font-body);outline:none;resize:none;height:38px;line-height:1.4;transition:border .2s,height .2s;overflow:hidden;-webkit-appearance:none; }
+.comment-inp:focus { border-color:rgba(0,64,255,.4);height:70px; }
+.comment-inp::placeholder { color:var(--txt3); }
+.comment-send-btn { position:absolute;right:8px;bottom:9px;width:24px;height:24px;border-radius:8px;background:var(--blue);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer; }
+.comment-send-btn i { font-size:13px;color:#fff; }
+.comment-item { display:flex;gap:8px;margin-bottom:12px; }
+.ci-av { width:30px;height:30px;border-radius:50%;background:rgba(0,64,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.ci-av i { font-size:14px;color:#4d7fff; }
+.ci-body { flex:1; }
+.ci-head { display:flex;align-items:center;gap:6px;margin-bottom:3px; }
+.ci-name { font-family:var(--font-display);font-size:12px;font-weight:700;color:#fff; }
+.ci-time { font-size:10px;color:var(--txt3); }
+.ci-text { font-size:12px;color:var(--txt2);line-height:1.5; }
+.ci-like { display:flex;align-items:center;gap:4px;margin-top:4px;cursor:pointer; }
+.ci-like i { font-size:13px;color:var(--txt3);transition:color .2s; }
+.ci-like span { font-size:11px;color:var(--txt3); }
+.ci-like.liked i,.ci-like.liked span { color:#ff3b30; }
+/* Apply Modal */
+.apply-modal { position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;flex-direction:column;z-index:200;opacity:0;pointer-events:none;transition:opacity .3s; }
+.apply-modal.show { opacity:1;pointer-events:all; }
+.apply-modal-inner { background:#111318;border-radius:24px 24px 0 0;margin-top:auto;padding:24px 20px;padding-bottom:calc(var(--safe-bottom) + 24px); }
+.apply-modal-title { font-family:var(--font-display);font-size:18px;font-weight:800;color:#fff;margin-bottom:4px; }
+.apply-modal-sub { font-size:12px;color:var(--txt2);margin-bottom:20px; }
+.apply-modal-field { margin-bottom:12px; }
+.apply-modal-label { font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:var(--font-display); }
+.apply-modal-input { width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;font-family:var(--font-body);outline:none;transition:border .2s;-webkit-appearance:none; }
+.apply-modal-input:focus { border-color:rgba(0,64,255,.4); }
+.apply-modal-input::placeholder,.apply-modal-textarea::placeholder { color:var(--txt3); }
+.apply-modal-textarea { width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;font-family:var(--font-body);outline:none;transition:border .2s;resize:none;height:80px;-webkit-appearance:none; }
+.apply-modal-textarea:focus { border-color:rgba(0,64,255,.4); }
+.apply-modal-btn { width:100%;height:50px;border-radius:14px;background:var(--blue);border:none;cursor:pointer;font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px; }
+.apply-modal-cancel { width:100%;height:44px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--border2);cursor:pointer;font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--txt2);margin-top:8px; }
+/* Success Overlay */
+.success-overlay { position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s; }
+.success-overlay.show { opacity:1;pointer-events:all; }
+.success-check { width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;margin-bottom:20px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from{transform:scale(0)}to{transform:scale(1)} }
+.success-title { font-family:var(--font-display);font-size:22px;font-weight:800;color:#fff;margin-bottom:8px; }
+.success-sub { font-size:13px;color:var(--txt2);text-align:center;max-width:220px;line-height:1.5; }
+.success-close { margin-top:24px;padding:12px 32px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid var(--border2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-display); }
+
+/* ═══ EXPLORE ═══ */
+#screen-explore { background:#0d0e14;overflow:hidden; }
+.explore-scroll { overflow-y:auto;-webkit-overflow-scrolling:touch;height:100%;padding-bottom:calc(60px + var(--safe-bottom)); }
+.explore-scroll::-webkit-scrollbar { display:none; }
+.explore-header { padding-top:calc(var(--safe-top) + 16px);padding-left:16px;padding-right:16px;padding-bottom:16px;background:#111318;border-bottom:1px solid var(--border); }
+.explore-title { font-family:var(--font-display);font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:12px; }
+.explore-search { display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1.5px solid var(--border2);border-radius:14px;padding:12px 14px;transition:border .2s; }
+.explore-search:focus-within { border-color:rgba(0,64,255,.4); }
+.explore-search-input { background:none;border:none;outline:none;font-size:13px;color:#fff;flex:1;font-family:var(--font-body);-webkit-appearance:none; }
+.explore-search-input::placeholder { color:var(--txt3); }
+.cat-scroll { display:flex;gap:8px;padding:14px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch; }
+.cat-scroll::-webkit-scrollbar { display:none; }
+.cat-chip { display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:30px;border:1.5px solid var(--border2);background:rgba(255,255,255,.04);font-size:12px;font-weight:700;color:var(--txt2);white-space:nowrap;cursor:pointer;transition:all .2s;font-family:var(--font-display); }
+.cat-chip.sel { background:var(--blue);border-color:var(--blue);color:#fff; }
+.explore-section { padding:0 16px 4px; }
+.explore-section-title { font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px; }
+.exp-card { background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .2s,transform .15s;display:flex;gap:12px;align-items:center; }
+.exp-card:active { transform:scale(.99); }
+.exp-icon { width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.exp-icon.j{background:rgba(0,64,255,.18);}
+.exp-icon.v{background:rgba(0,201,134,.15);}
+.exp-icon.a{background:rgba(255,107,0,.15);}
+.exp-info { flex:1; }
+.exp-title { font-family:var(--font-display);font-size:14px;font-weight:700;color:#fff;margin-bottom:3px; }
+.exp-sub { font-size:12px;color:var(--txt2);margin-bottom:6px; }
+.exp-tags { display:flex;gap:5px;flex-wrap:wrap; }
+.exp-tag { font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;font-family:var(--font-display); }
+.exp-right { text-align:right;flex-shrink:0; }
+.exp-dist { font-size:12px;font-weight:700;color:var(--blue);font-family:var(--font-display); }
+.exp-pay { font-size:11px;color:var(--txt3);margin-top:3px; }
+.no-results { text-align:center;padding:32px 16px;color:var(--txt3);font-size:13px; }
+.no-results i { font-size:32px;display:block;margin-bottom:8px; }
+
+/* ═══ PROFILE ═══ */
+#screen-profile { background:#0d0e14; }
+.profile-scroll { overflow-y:auto;-webkit-overflow-scrolling:touch;height:100%;padding-bottom:calc(60px + var(--safe-bottom)); }
+.profile-scroll::-webkit-scrollbar { display:none; }
+.profile-top { padding-top:calc(var(--safe-top) + 20px);padding-left:20px;padding-right:20px;padding-bottom:20px;background:#111318;border-bottom:1px solid var(--border);text-align:center; }
+.pf-av { width:76px;height:76px;border-radius:50%;background:var(--blue);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,.12);box-shadow:0 0 0 6px rgba(0,64,255,.1);cursor:pointer;position:relative;overflow:hidden; }
+.pf-av-edit { position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;border-radius:50%; }
+.pf-av:hover .pf-av-edit { display:flex; }
+.pf-av i { font-size:38px;color:#fff; }
+.pf-name { font-family:var(--font-display);font-size:22px;font-weight:800;color:#fff;margin-bottom:3px;letter-spacing:-.3px; }
+.pf-city { font-size:13px;color:var(--txt2); }
+.pf-badges { display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap; }
+.pf-b { font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;font-family:var(--font-display); }
+.pf-b1{background:rgba(0,64,255,.2);color:#4d7fff;}
+.pf-b2{background:rgba(0,201,134,.15);color:var(--green);}
+.pf-b3{background:rgba(255,165,0,.15);color:var(--gold);}
+.pf-edit-btn { margin-top:14px;display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:30px;border:1.5px solid var(--border2);background:rgba(255,255,255,.05);font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;font-family:var(--font-display); }
+.trust-big { margin:16px;border-radius:20px;background:linear-gradient(135deg,#0040ff,#0055ff);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,64,255,.3); }
+.tb-num { font-family:var(--font-display);font-size:48px;font-weight:800;color:#fff;line-height:1;letter-spacing:-2px; }
+.tb-info .tbi-title { font-family:var(--font-display);font-size:14px;font-weight:700;color:#fff; }
+.tb-info .tbi-sub { font-size:11px;color:rgba(255,255,255,.6);margin-top:2px; }
+.tb-bar { height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:10px;overflow:hidden; }
+.tb-bar-fill { height:100%;background:#fff;border-radius:2px;width:94%;animation:barGrow 1.2s ease-out forwards; }
+@keyframes barGrow { from{width:0}to{width:94%} }
+.pf-section { padding:0 16px 12px; }
+.pf-slabel { font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px; }
+.cert-row { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px; }
+.cert-c { background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px;cursor:pointer;transition:border-color .2s; }
+.cert-c:hover { border-color:rgba(255,255,255,.2); }
+.cert-c-icon { font-size:22px;margin-bottom:6px; }
+.cert-c-name { font-family:var(--font-display);font-size:12px;font-weight:700;color:#fff; }
+.cert-c-date { font-size:10px;color:var(--txt3);margin-top:2px; }
+.review-item { background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px;margin-bottom:8px; }
+.ri-head { display:flex;align-items:center;gap:8px;margin-bottom:7px; }
+.ri-av { width:32px;height:32px;border-radius:10px;background:rgba(0,64,255,.18);display:flex;align-items:center;justify-content:center; }
+.ri-av i { font-size:16px;color:#4d7fff; }
+.ri-name { font-family:var(--font-display);font-size:12px;font-weight:700;color:#fff; }
+.ri-stars { font-size:10px;color:var(--gold);letter-spacing:1px; }
+.ri-date { margin-left:auto;font-size:10px;color:var(--txt3); }
+.ri-body { font-size:12px;color:var(--txt2);line-height:1.55; }
+.stat-2 { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:16px; }
+.stat-c { background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 12px; }
+.stat-c .sn { font-family:var(--font-display);font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px; }
+.stat-c .sl { font-size:11px;color:var(--txt3);margin-top:2px; }
+.pf-settings-row { display:flex;flex-direction:column;gap:0; }
+.pf-setting-item { display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s; }
+.pf-setting-item:hover { background:rgba(255,255,255,.03); }
+.pf-si-icon { width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.pf-si-label { font-size:13px;font-weight:600;color:#fff;font-family:var(--font-display); }
+.pf-si-sub { font-size:11px;color:var(--txt3);margin-top:1px; }
+.pf-si-arrow { margin-left:auto;color:var(--txt3);font-size:16px; }
+/* Edit Profile */
+.edit-overlay { position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:150;display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s; }
+.edit-overlay.show { opacity:1;pointer-events:all; }
+.edit-sheet { background:#111318;border-radius:24px 24px 0 0;padding:20px 20px;padding-bottom:calc(var(--safe-bottom) + 24px); }
+.edit-sheet-title { font-family:var(--font-display);font-size:18px;font-weight:800;color:#fff;margin-bottom:16px; }
+.edit-field { margin-bottom:12px; }
+.edit-label { font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-family:var(--font-display); }
+.edit-input { width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;font-family:var(--font-body);outline:none;transition:border .2s;-webkit-appearance:none; }
+.edit-input:focus { border-color:rgba(0,64,255,.4); }
+.edit-save-btn { width:100%;height:48px;border-radius:14px;background:var(--blue);border:none;cursor:pointer;font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;margin-top:8px; }
+.edit-cancel-btn { width:100%;height:44px;border-radius:14px;background:none;border:1px solid var(--border2);cursor:pointer;font-family:var(--font-display);font-size:13px;font-weight:600;color:var(--txt2);margin-top:8px; }
+
+/* ═══ ALERTS ═══ */
+#screen-alerts { background:#0d0e14;overflow:hidden; }
+.alerts-scroll { overflow-y:auto;-webkit-overflow-scrolling:touch;height:100%;padding-bottom:calc(60px + var(--safe-bottom)); }
+.alerts-scroll::-webkit-scrollbar { display:none; }
+.alerts-header { padding-top:calc(var(--safe-top) + 16px);padding-left:16px;padding-right:16px;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+.alerts-title { font-family:var(--font-display);font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px; }
+.alerts-mark-all { font-size:12px;color:#4d7fff;cursor:pointer;font-weight:600; }
+.alert-item { display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s; }
+.alert-item.unread { background:rgba(0,64,255,.05); }
+.alert-av { width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0; }
+.alert-av.blue{background:rgba(0,64,255,.18);}
+.alert-av.green{background:rgba(0,201,134,.15);}
+.alert-av.orange{background:rgba(255,107,0,.15);}
+.alert-av.gold{background:rgba(255,170,0,.15);}
+.alert-content { flex:1; }
+.alert-title { font-size:13px;font-weight:600;color:#fff;margin-bottom:3px;font-family:var(--font-display); }
+.alert-body { font-size:12px;color:var(--txt2);line-height:1.5; }
+.alert-time { font-size:10px;color:var(--txt3);margin-top:4px; }
+.alert-dot { width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px; }
+
+/* ═══ POST ═══ */
+#screen-post { background:#0d0e14; }
+.post-header { padding-top:calc(var(--safe-top) + 16px);padding-left:16px;padding-right:16px;padding-bottom:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+.post-title { font-family:var(--font-display);font-size:22px;font-weight:800;color:#fff;letter-spacing:-.3px; }
+.post-scroll { overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100% - 80px);padding:16px 16px;padding-bottom:calc(var(--safe-bottom) + 20px); }
+.post-scroll::-webkit-scrollbar { display:none; }
+.post-type-row { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px; }
+.post-type { border:2px solid var(--border2);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s; }
+.post-type.sel-j{border-color:var(--blue);background:var(--blue-lt);}
+.post-type.sel-v{border-color:var(--green);background:var(--green-lt);}
+.post-type.sel-a{border-color:var(--orange);background:var(--orange-lt);}
+.post-type i { font-size:24px;margin-bottom:6px;display:block; }
+.post-type span { font-size:11px;font-weight:700;color:var(--txt2);font-family:var(--font-display); }
+.post-input { width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);border-radius:14px;padding:13px 15px;font-size:13px;color:#fff;font-family:var(--font-body);outline:none;transition:border .2s;margin-bottom:10px;-webkit-appearance:none; }
+.post-input::placeholder { color:var(--txt3); }
+.post-input:focus { border-color:rgba(0,64,255,.4); }
+.post-input.perr { border-color:rgba(255,59,48,.5); }
+.post-textarea { width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);border-radius:14px;padding:13px 15px;font-size:13px;color:#fff;font-family:var(--font-body);outline:none;transition:border .2s;margin-bottom:10px;resize:none;height:90px;-webkit-appearance:none; }
+.post-textarea::placeholder { color:var(--txt3); }
+.post-textarea:focus { border-color:rgba(0,64,255,.4); }
+.post-textarea.perr { border-color:rgba(255,59,48,.5); }
+.post-label { font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-family:var(--font-display);display:flex;align-items:center;gap:4px; }
+.post-label .req { color:#ff3b30; }
+.post-submit { width:100%;height:52px;border-radius:16px;background:var(--blue);border:none;cursor:pointer;font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;transition:transform .15s;box-shadow:0 6px 24px rgba(0,64,255,.35); }
+.post-submit:active { transform:scale(.97); }
+.post-char { font-size:10px;color:var(--txt3);text-align:right;margin-top:-8px;margin-bottom:8px; }
+
+/* ═══ SAVED ═══ */
+#screen-saved { background:#0d0e14;overflow:hidden; }
+.saved-scroll { overflow-y:auto;-webkit-overflow-scrolling:touch;height:100%;padding-bottom:calc(60px + var(--safe-bottom)); }
+.saved-scroll::-webkit-scrollbar { display:none; }
+.saved-header { padding-top:calc(var(--safe-top) + 16px);padding-left:16px;padding-right:16px;padding-bottom:14px;border-bottom:1px solid var(--border); }
+.saved-title { font-family:var(--font-display);font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px; }
+.saved-subtitle { font-size:12px;color:var(--txt3);margin-top:4px; }
+.saved-empty { padding:60px 24px;text-align:center; }
+.saved-empty i { font-size:40px;color:var(--txt3);display:block;margin-bottom:12px; }
+.saved-empty p { font-size:13px;color:var(--txt3);line-height:1.6; }
+.saved-item { display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer; }
+.saved-item-icon { width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0; }
+.saved-item-title { font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;font-family:var(--font-display); }
+.saved-item-sub { font-size:11px;color:var(--txt2); }
+.saved-item-remove { margin-left:auto;font-size:18px;color:var(--txt3);cursor:pointer;padding:4px; }
+
+/* ─── TOAST ─── */
+.toast { position:fixed;bottom:calc(60px + var(--safe-bottom) + 12px);left:50%;transform:translateX(-50%) translateY(100px);background:#111318;border:1px solid var(--border2);border-radius:16px;padding:12px 20px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#fff;font-family:var(--font-display);z-index:9999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,.5);white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast i { font-size:18px; }
+
+/* slide-in animation */
+@keyframes slideIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+.slide-in { animation:slideIn .3s ease forwards; }
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — TABLET & DESKTOP
+══════════════════════════════════════════════════ */
+
+/* ─── Centered app container on wide screens ─── */
+@media (min-width: 600px) {
+  html, body {
+    overflow: auto;
+    position: static;
+    height: 100%;
+  }
+
+  body {
+    position: static;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: #060710;
+    min-height: 100%;
+    padding: 24px 16px;
+  }
+
+  #app-shell {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: 430px;
+    height: 844px;
+    min-height: 600px;
+    max-height: calc(100vh - 48px);
+    border-radius: 36px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08);
+  }
+
+  .screen-wrap {
+    border-radius: 36px;
+    overflow: hidden;
+  }
+
+  .screen {
+    border-radius: 36px;
+  }
+
+  .bottom-nav {
+    border-radius: 0 0 36px 36px;
+  }
+
+  .toast {
+    bottom: calc(60px + var(--safe-bottom) + 16px);
+  }
+
+  /* Fix fixed-positioned overlays to stay within the app shell */
+  .apply-modal,
+  .success-overlay,
+  .edit-overlay {
+    position: absolute;
+    border-radius: 36px;
+  }
+
+  .apply-bar {
+    position: absolute;
+    border-radius: 0 0 36px 36px;
+  }
+}
+
+/* ─── Large tablet / desktop: two-column ─── */
+@media (min-width: 900px) {
+  body {
+    align-items: center;
+    padding: 0 40px;
+    min-height: 100vh;
+  }
+
+  #app-shell {
+    max-width: 390px;
+    height: min(844px, calc(100vh - 40px));
+  }
+
+  /* Decorative background gradient for desktop */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 60% at 20% 50%, rgba(0,64,255,.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 50% at 80% 50%, rgba(0,201,134,.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* ─── Small phones (≤ 360px) ─── */
+@media (max-width: 360px) {
+  .intro-wordmark { font-size: 34px; }
+  .intro-tagline { font-size: 13px; }
+  .btn-primary, .btn-secondary { height: 48px; font-size: 14px; }
+  .intro-pill { font-size: 11px; padding: 6px 10px; }
+
+  .bnav-item i { font-size: 20px; }
+  .bnav-label { font-size: 9px; }
+
+  .detail-title { font-size: 20px; }
+  .explore-title, .alerts-title, .saved-title { font-size: 22px; }
+
+  .post-type-row { gap: 6px; }
+  .post-type { padding: 11px 6px; }
+  .post-type i { font-size: 20px; }
+  .post-type span { font-size: 10px; }
+
+  .role-cards { gap: 8px; }
+  .rc { padding: 12px 8px; }
+  .rc-icon { font-size: 22px; }
+  .rc-name { font-size: 11px; }
+
+  .cert-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .stat-2 { gap: 6px; }
+  .stat-c .sn { font-size: 22px; }
+
+  .tb-num { font-size: 40px; }
+  .trust-big { padding: 13px 16px; gap: 12px; }
+
+  .exp-card { padding: 11px; gap: 10px; }
+  .exp-icon { width: 44px; height: 44px; }
+}
+
+/* ─── Very small phones (≤ 320px) ─── */
+@media (max-width: 320px) {
+  .intro-wordmark { font-size: 30px; letter-spacing: -1.5px; }
+  .intro-logo-mark { width: 68px; height: 68px; border-radius: 20px; }
+  .pf-av { width: 64px; height: 64px; }
+  .pf-av i { font-size: 30px; }
+  .pf-name { font-size: 19px; }
+  .tb-num { font-size: 34px; }
+  .auth-hero { height: 160px; }
+  .auth-body h2 { font-size: 20px; }
+}
+
+/* ─── Landscape phones ─── */
+@media (max-height: 500px) and (orientation: landscape) {
+  body {
+    overflow: auto;
+    position: static;
+  }
+
+  #app-shell {
+    position: static;
+    height: auto;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    max-width: 100%;
+  }
+
+  .screen-wrap, .screen {
+    border-radius: 0;
+  }
+
+  .screen {
+    position: relative;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .intro-content {
+    padding-top: calc(var(--safe-top) + 20px);
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .intro-logo-mark {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .intro-wordmark { font-size: 28px; margin-bottom: 4px; }
+  .intro-tagline { font-size: 12px; margin-bottom: 12px; max-width: 220px; }
+  .intro-pills { margin-bottom: 12px; }
+  .intro-actions { max-width: 280px; }
+  .btn-primary, .btn-secondary { height: 44px; }
+
+  .auth-hero { height: 120px; }
+  .auth-body { height: calc(100% - 120px); }
+
+  .bottom-nav {
+    position: fixed;
+  }
+
+  .explore-scroll,
+  .profile-scroll,
+  .alerts-scroll,
+  .saved-scroll {
+    height: calc(100vh - 60px);
+  }
+
+  .post-scroll {
+    height: calc(100vh - 80px);
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="app-shell">
+  <div class="screen-wrap">
+
+    <!-- ══ SCREEN: INTRO ══ -->
+    <div class="screen" id="screen-intro">
+      <div class="intro-bg"></div>
+      <div class="intro-grid"></div>
+      <div class="intro-content">
+        <div class="intro-logo-mark">
+          <i class="ti ti-map-pin" style="font-size:40px;color:#fff;position:relative;z-index:1;"></i>
+        </div>
+        <div class="intro-wordmark">Mr<span>Joon</span>.am</div>
+        <div class="intro-tagline">Your map for jobs, volunteer work &amp; activities — right in your city.</div>
+        <div class="intro-pills">
+          <div class="intro-pill blue"><i class="ti ti-briefcase"></i> Jobs</div>
+          <div class="intro-pill green"><i class="ti ti-heart"></i> Volunteer</div>
+          <div class="intro-pill orange"><i class="ti ti-camera"></i> Activities</div>
+        </div>
+        <div class="intro-actions">
+          <button class="btn-primary" onclick="navigateTo('auth',{mode:'signup'})">
+            <i class="ti ti-user-plus"></i> Create Account
+          </button>
+          <button class="btn-secondary" onclick="navigateTo('auth',{mode:'login'})">
+            <i class="ti ti-login"></i> Sign In
+          </button>
+          <div class="intro-note">
+            <a onclick="navigateTo('map')">Skip — Explore as guest →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: AUTH ══ -->
+    <div class="screen hidden" id="screen-auth">
+      <div class="auth-hero">
+        <div class="auth-hero-grid"></div>
+        <div class="auth-hero-blob" style="width:180px;height:180px;top:-60px;right:-40px"></div>
+        <div class="auth-hero-blob" style="width:100px;height:100px;bottom:-20px;left:30px"></div>
+        <div style="position:absolute;left:0;right:0;top:42%;height:3px;background:rgba(255,255,255,.1)"></div>
+        <div style="position:absolute;top:0;bottom:0;left:55%;width:2px;background:rgba(255,255,255,.1)"></div>
+        <div style="position:absolute;left:40%;top:36%;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center">
+          <div class="pin-dot pin-job" style="font-size:11px">MrJoon.am</div>
+          <div class="pin-stem pin-stem-job"></div>
+        </div>
+        <div class="my-ring" style="left:54%;top:66%"></div>
+        <div class="my-dot" style="left:54%;top:66%"></div>
+        <div class="auth-logo">Mr<span>Joon</span>.am</div>
+        <div class="auth-back" onclick="goBack()"><i class="ti ti-chevron-left"></i></div>
+      </div>
+      <div class="auth-body">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Sign In</div>
+          <div class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Sign Up</div>
+        </div>
+        <!-- LOGIN -->
+        <div id="loginPanel">
+          <h2>Welcome back 👋</h2>
+          <p>Sign in to find opportunities near you.</p>
+          <div class="input-group">
+            <i class="ti ti-mail input-icon"></i>
+            <input class="input-field" type="email" placeholder="Email address" id="loginEmail" oninput="clearFieldErr(this)">
+          </div>
+          <div class="field-err" id="loginEmailErr">Please enter a valid email address.</div>
+          <div class="input-group">
+            <i class="ti ti-lock input-icon"></i>
+            <input class="input-field" type="password" placeholder="Password" id="loginPass" oninput="clearFieldErr(this)">
+            <i class="ti ti-eye input-eye" onclick="togglePass('loginPass',this)"></i>
+          </div>
+          <div class="field-err" id="loginPassErr">Password is required.</div>
+          <div style="text-align:right;margin-bottom:12px;">
+            <a style="font-size:12px;color:#4d7fff;cursor:pointer;" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).toastPassReset,'ti-mail','#4d7fff')">Forgot password?</a>
+          </div>
+          <button class="big-btn" onclick="doLogin()">Sign In <i class="ti ti-arrow-right"></i></button>
+          <div class="divider-row"><div class="divider-line"></div><div class="divider-txt">or continue with</div><div class="divider-line"></div></div>
+          <div class="social-btns">
+            <div class="social-btn" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).toastGoogleLogin,'ti-brand-google','#4d7fff')"><i class="ti ti-brand-google" style="color:#4285F4"></i> Google</div>
+            <div class="social-btn" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).toastAppleLogin,'ti-brand-apple','#fff')"><i class="ti ti-brand-apple"></i> Apple</div>
+          </div>
+          <div class="auth-switch">Don't have an account? <a onclick="switchAuthTab('signup')">Sign up</a></div>
+        </div>
+        <!-- SIGNUP -->
+        <div id="signupPanel" style="display:none">
+          <h2>Join MrJoon.am</h2>
+          <p>Choose your role to personalise your map.</p>
+          <div class="role-cards">
+            <div class="rc sel" id="rc-seeker" onclick="selectRole('seeker')">
+              <div class="rc-icon"><i class="ti ti-search" style="font-size:24px;color:#4d7fff"></i></div>
+              <div class="rc-name">Job Seeker</div><div class="rc-desc">Find nearby work</div>
+            </div>
+            <div class="rc" id="rc-employer" onclick="selectRole('employer')">
+              <div class="rc-icon"><i class="ti ti-building" style="font-size:24px;color:var(--txt3)"></i></div>
+              <div class="rc-name">Employer</div><div class="rc-desc">Post &amp; hire</div>
+            </div>
+          </div>
+          <div class="input-group">
+            <i class="ti ti-user input-icon"></i>
+            <input class="input-field" type="text" placeholder="Full name" id="signupName" oninput="clearFieldErr(this)">
+          </div>
+          <div class="field-err" id="signupNameErr">Please enter your full name.</div>
+          <div class="input-group">
+            <i class="ti ti-mail input-icon"></i>
+            <input class="input-field" type="email" placeholder="Email address" id="signupEmail" oninput="clearFieldErr(this)">
+          </div>
+          <div class="field-err" id="signupEmailErr">Please enter a valid email address.</div>
+          <div class="input-group">
+            <i class="ti ti-lock input-icon"></i>
+            <input class="input-field" type="password" placeholder="Password (min 8 characters)" id="signupPass" oninput="checkPassStrength(this.value);clearFieldErr(this)">
+            <i class="ti ti-eye input-eye" onclick="togglePass('signupPass',this)"></i>
+          </div>
+          <div class="pass-strength" id="passStrength">
+            <div class="ps-bar" id="ps1"></div><div class="ps-bar" id="ps2"></div><div class="ps-bar" id="ps3"></div>
+          </div>
+          <div class="ps-label" id="psLabel" style="color:var(--txt3)"></div>
+          <div class="field-err" id="signupPassErr">Password must be at least 8 characters.</div>
+          <button class="big-btn" onclick="doSignup()">Create Account <i class="ti ti-arrow-right"></i></button>
+          <div class="divider-row"><div class="divider-line"></div><div class="divider-txt">or sign up with</div><div class="divider-line"></div></div>
+          <div class="social-btns">
+            <div class="social-btn" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).toastGoogleSignup,'ti-brand-google','#4285F4')"><i class="ti ti-brand-google" style="color:#4285F4"></i> Google</div>
+            <div class="social-btn" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).toastAppleSignup,'ti-brand-apple','#fff')"><i class="ti ti-brand-apple"></i> Apple</div>
+          </div>
+          <div class="auth-switch">Already have an account? <a onclick="switchAuthTab('login')">Sign in</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: MAP ══ -->
+    <div class="screen hidden" id="screen-map" style="background:#1a1e2e;">
+      <!-- Real Mapbox map -->
+      <div id="mapbox-container"></div>
+
+      <!-- Search + filter overlay -->
+      <div class="map-header">
+        <div class="search-pill">
+          <i class="ti ti-search s-ic"></i>
+          <input id="gis-search" type="text" placeholder="Փնտրիր հայտարարություն..." style="background:none;border:none;outline:none;color:#fff;font-size:13px;flex:1;font-family:var(--font-body);">
+          <select id="gis-filter" style="background:rgba(0,64,255,.2);border:none;outline:none;color:#4d7fff;font-size:11px;font-weight:700;border-radius:8px;padding:3px 6px;cursor:pointer;font-family:var(--font-display);">
+            <option value="all">Բոլորը</option>
+            <option value="ներկում">Ներկում</option>
+            <option value="մաքրում">Մաքրում</option>
+            <option value="վարպետ">Վարպետ</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Location button -->
+      <button id="gis-loc-btn" style="position:absolute;top:calc(var(--safe-top) + 72px);right:16px;z-index:25;background:#0040ff;color:#fff;border:none;border-radius:12px;padding:9px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 4px 16px rgba(0,64,255,.4);font-family:var(--font-display);">
+        <i class="ti ti-current-location" style="font-size:16px"></i> <span id="loc-btn-label">Իմ տեղը</span>
+      </button>
+      <!-- Language toggle button -->
+      <button id="gis-lang-btn" onclick="toggleLang()" style="position:absolute;top:calc(var(--safe-top) + 120px);right:16px;z-index:25;background:#111318;color:#fff;border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:9px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 4px 16px rgba(0,0,0,.3);font-family:var(--font-display);">
+        <i class="ti ti-language" style="font-size:16px"></i> <span id="lang-label">ՀԱՅ</span>
+      </button>
+
+      <!-- Bottom sheet with Supabase listings -->
+      <div class="bottom-sheet">
+        <div class="sheet-handle" onclick="toggleBottomSheet()" style="cursor:pointer;"></div>
+        <div id="gis-list">
+          <div style="padding:20px;text-align:center;color:var(--txt3);font-size:13px;">Քարտեզը բեռնվում է...</div>
+        </div>
+      </div>
+
+      <div class="bottom-nav" id="bnav-map">
+        <div class="bnav-item active" onclick="navigateTo('map')"><i class="ti ti-map-2"></i><span class="bnav-label">Map</span></div>
+        <div class="bnav-item" onclick="navigateTo('explore')"><i class="ti ti-search"></i><span class="bnav-label">Explore</span></div>
+        <div class="bnav-item" onclick="navigateTo('post')"><i class="ti ti-plus"></i><span class="bnav-label">Post</span></div>
+        <div class="bnav-item" onclick="navigateTo('alerts')"><i class="ti ti-bell"></i><span class="bnav-label">Alerts</span><div class="bnav-badge" id="alertBadge" style="display:none"></div></div>
+        <div class="bnav-item" onclick="navigateTo('profile')"><i class="ti ti-user"></i><span class="bnav-label">Profile</span></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: DETAIL ══ -->
+    <div class="screen hidden" id="screen-detail" style="background:#0d0e14;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+      <div id="detail-content"></div>
+    </div>
+
+    <!-- ══ SCREEN: EXPLORE ══ -->
+    <div class="screen hidden" id="screen-explore">
+      <div class="explore-scroll">
+        <div class="explore-header">
+          <div class="explore-title">Explore</div>
+          <div class="explore-search">
+            <i class="ti ti-search s-ic"></i>
+            <input class="explore-search-input" id="exploreSearchInput" type="text" placeholder="Search jobs, volunteer, activities…" oninput="filterListings(this.value)">
+          </div>
+        </div>
+        <div class="cat-scroll">
+          <div class="cat-chip sel" onclick="selectCat(this,'all')"><i class="ti ti-layout-grid"></i> All</div>
+          <div class="cat-chip" onclick="selectCat(this,'job')"><i class="ti ti-briefcase"></i> Jobs</div>
+          <div class="cat-chip" onclick="selectCat(this,'vol')"><i class="ti ti-heart"></i> Volunteer</div>
+          <div class="cat-chip" onclick="selectCat(this,'act')"><i class="ti ti-camera"></i> Activities</div>
+          <div class="cat-chip" onclick="selectCat(this,'featured')"><i class="ti ti-star"></i> Featured</div>
+        </div>
+        <div class="explore-section">
+          <div class="explore-section-title" id="exploreLabel">Near You · 5km</div>
+          <div id="exploreList"></div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="bnav-item" onclick="navigateTo('map')"><i class="ti ti-map-2"></i><span class="bnav-label">Map</span></div>
+        <div class="bnav-item active"><i class="ti ti-search"></i><span class="bnav-label">Explore</span></div>
+        <div class="bnav-item" onclick="navigateTo('post')"><i class="ti ti-plus"></i><span class="bnav-label">Post</span></div>
+        <div class="bnav-item" onclick="navigateTo('alerts')"><i class="ti ti-bell"></i><span class="bnav-label">Alerts</span></div>
+        <div class="bnav-item" onclick="navigateTo('profile')"><i class="ti ti-user"></i><span class="bnav-label">Profile</span></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: PROFILE ══ -->
+    <div class="screen hidden" id="screen-profile">
+      <div class="profile-scroll">
+        <div class="profile-top">
+          <div class="pf-av" onclick="openEditProfile()">
+            <i class="ti ti-user" style="font-size:38px;color:#fff"></i>
+            <div class="pf-av-edit"><i class="ti ti-camera" style="font-size:18px;color:#fff"></i></div>
+          </div>
+          <div class="pf-name" id="pfName">Ani Petrosyan</div>
+          <div class="pf-city" id="pfCity">UX Designer · Yerevan</div>
+          <div class="pf-badges">
+            <div class="pf-b pf-b1">Verified</div>
+            <div class="pf-b pf-b2">12h volunteer</div>
+            <div class="pf-b pf-b3">Top rated</div>
+          </div>
+          <div class="pf-edit-btn" onclick="openEditProfile()"><i class="ti ti-pencil" style="font-size:13px"></i> Edit Profile</div>
+        </div>
+        <div class="trust-big">
+          <div class="tb-num">94</div>
+          <div class="tb-info" style="flex:1">
+            <div class="tbi-title">Highly trusted</div>
+            <div class="tbi-sub">Based on 18 reviews</div>
+            <div class="tb-bar"><div class="tb-bar-fill"></div></div>
+          </div>
+          <i class="ti ti-shield-check" style="font-size:28px;color:rgba(255,255,255,.35)"></i>
+        </div>
+        <div class="pf-section">
+          <div class="stat-2">
+            <div class="stat-c"><div class="sn">18</div><div class="sl">Total reviews</div></div>
+            <div class="stat-c"><div class="sn">12h</div><div class="sl">Volunteer hrs</div></div>
+          </div>
+        </div>
+        <div class="pf-section">
+          <div class="pf-slabel">Certificates</div>
+          <div class="cert-row">
+            <div class="cert-c" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).certEco,'ti-leaf','#00c986')">
+              <div class="cert-c-icon"><i class="ti ti-leaf" style="font-size:22px;color:#00c986"></i></div>
+              <div class="cert-c-name">Eco Volunteer</div><div class="cert-c-date">Mar 2025</div>
+            </div>
+            <div class="cert-c" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).certMentor,'ti-school','#4d7fff')">
+              <div class="cert-c-icon"><i class="ti ti-school" style="font-size:22px;color:#4d7fff"></i></div>
+              <div class="cert-c-name">Youth Mentor</div><div class="cert-c-date">Jan 2025</div>
+            </div>
+          </div>
+        </div>
+        <div class="pf-section">
+          <div class="pf-slabel">Reviews</div>
+          <div class="review-item">
+            <div class="ri-head"><div class="ri-av"><i class="ti ti-building"></i></div><div><div class="ri-name">Picsart</div><div class="ri-stars">★★★★★</div></div><div class="ri-date">Apr 2025</div></div>
+            <div class="ri-body">Exceptional UX work. Delivered on time and exceeded expectations.</div>
+          </div>
+          <div class="review-item">
+            <div class="ri-head"><div class="ri-av"><i class="ti ti-leaf" style="color:#00c986"></i></div><div><div class="ri-name">EcoYerevan NGO</div><div class="ri-stars">★★★★★</div></div><div class="ri-date">Mar 2025</div></div>
+            <div class="ri-body">Punctual, reliable, and energetic. A true community asset.</div>
+          </div>
+        </div>
+        <div class="pf-section">
+          <div class="pf-slabel">Settings</div>
+          <div class="pf-settings-row">
+            <div class="pf-setting-item" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).notifSettings,'ti-bell','#4d7fff')">
+              <div class="pf-si-icon" style="background:rgba(0,64,255,.15)"><i class="ti ti-bell" style="color:#4d7fff;font-size:16px"></i></div>
+              <div><div class="pf-si-label">Notifications</div><div class="pf-si-sub">Alerts &amp; updates</div></div>
+              <i class="ti ti-chevron-right pf-si-arrow"></i>
+            </div>
+            <div class="pf-setting-item" onclick="showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).privacySettings,'ti-shield','#00c986')">
+              <div class="pf-si-icon" style="background:rgba(0,201,134,.12)"><i class="ti ti-shield" style="color:#00c986;font-size:16px"></i></div>
+              <div><div class="pf-si-label">Privacy</div><div class="pf-si-sub">Control your data</div></div>
+              <i class="ti ti-chevron-right pf-si-arrow"></i>
+            </div>
+            <div class="pf-setting-item" onclick="doLogout()">
+              <div class="pf-si-icon" style="background:rgba(255,59,48,.1)"><i class="ti ti-logout" style="color:#ff3b30;font-size:16px"></i></div>
+              <div><div class="pf-si-label" style="color:#ff3b30">Sign Out</div><div class="pf-si-sub">Log out of your account</div></div>
+              <i class="ti ti-chevron-right pf-si-arrow"></i>
+            </div>
+          </div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+      <!-- Edit Profile Overlay -->
+      <div class="edit-overlay" id="editProfileOverlay">
+        <div class="edit-sheet">
+          <div class="edit-sheet-title">Edit Profile</div>
+          <div class="edit-field"><div class="edit-label">Full Name</div><input class="edit-input" id="editName" type="text" value="Ani Petrosyan"></div>
+          <div class="edit-field"><div class="edit-label">Title &amp; City</div><input class="edit-input" id="editCity" type="text" value="UX Designer · Yerevan"></div>
+          <button class="edit-save-btn" onclick="saveProfile()">Save Changes</button>
+          <button class="edit-cancel-btn" onclick="closeEditProfile()">Cancel</button>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="bnav-item" onclick="navigateTo('map')"><i class="ti ti-map-2"></i><span class="bnav-label">Map</span></div>
+        <div class="bnav-item" onclick="navigateTo('explore')"><i class="ti ti-search"></i><span class="bnav-label">Explore</span></div>
+        <div class="bnav-item" onclick="navigateTo('post')"><i class="ti ti-plus"></i><span class="bnav-label">Post</span></div>
+        <div class="bnav-item" onclick="navigateTo('alerts')"><i class="ti ti-bell"></i><span class="bnav-label">Alerts</span></div>
+        <div class="bnav-item active"><i class="ti ti-user"></i><span class="bnav-label">Profile</span></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: ALERTS ══ -->
+    <div class="screen hidden" id="screen-alerts">
+      <div class="alerts-scroll">
+        <div class="alerts-header">
+          <div class="alerts-title">Notifications</div>
+          <div class="alerts-mark-all" onclick="markAllRead()">Mark all read</div>
+        </div>
+        <div id="alertsList">
+          <div class="alert-item unread" onclick="readAlert(this,'Application viewed')">
+            <div class="alert-av blue"><i class="ti ti-briefcase" style="font-size:19px;color:#4d7fff"></i></div>
+            <div class="alert-content"><div class="alert-title">New match: Senior UX Designer</div><div class="alert-body">Picsart is looking for someone like you — 8 min away.</div><div class="alert-time">2 min ago</div></div>
+            <div class="alert-dot"></div>
+          </div>
+          <div class="alert-item unread" onclick="readAlert(this,'Volunteer badge added')">
+            <div class="alert-av green"><i class="ti ti-leaf" style="font-size:19px;color:#00c986"></i></div>
+            <div class="alert-content"><div class="alert-title">Volunteer certificate earned!</div><div class="alert-body">Eco Volunteer badge added to your profile.</div><div class="alert-time">1 hr ago</div></div>
+            <div class="alert-dot"></div>
+          </div>
+          <div class="alert-item" onclick="readAlert(this,'Profile viewed')">
+            <div class="alert-av blue"><i class="ti ti-eye" style="font-size:19px;color:#4d7fff"></i></div>
+            <div class="alert-content"><div class="alert-title">Picsart viewed your profile</div><div class="alert-body">They opened your portfolio link.</div><div class="alert-time">3 hr ago</div></div>
+          </div>
+          <div class="alert-item" onclick="readAlert(this,'Review received')">
+            <div class="alert-av gold"><i class="ti ti-star" style="font-size:19px;color:#ffaa00"></i></div>
+            <div class="alert-content"><div class="alert-title">New 5★ review from EcoYerevan</div><div class="alert-body">Punctual, reliable, and energetic.</div><div class="alert-time">Yesterday</div></div>
+          </div>
+          <div class="alert-item" onclick="readAlert(this,'Trust score updated')">
+            <div class="alert-av green"><i class="ti ti-shield-check" style="font-size:19px;color:#00c986"></i></div>
+            <div class="alert-content"><div class="alert-title">Trust score updated to 94</div><div class="alert-body">Your score increased by 2 points this week.</div><div class="alert-time">2 days ago</div></div>
+          </div>
+          <div class="alert-item" onclick="readAlert(this,'Reminder set')">
+            <div class="alert-av orange"><i class="ti ti-calendar" style="font-size:19px;color:#ff8c42"></i></div>
+            <div class="alert-content"><div class="alert-title">City Walking Tour — Tomorrow</div><div class="alert-body">Your activity starts at 10:00 AM.</div><div class="alert-time">2 days ago</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="bnav-item" onclick="navigateTo('map')"><i class="ti ti-map-2"></i><span class="bnav-label">Map</span></div>
+        <div class="bnav-item" onclick="navigateTo('explore')"><i class="ti ti-search"></i><span class="bnav-label">Explore</span></div>
+        <div class="bnav-item" onclick="navigateTo('post')"><i class="ti ti-plus"></i><span class="bnav-label">Post</span></div>
+        <div class="bnav-item active"><i class="ti ti-bell"></i><span class="bnav-label">Alerts</span></div>
+        <div class="bnav-item" onclick="navigateTo('profile')"><i class="ti ti-user"></i><span class="bnav-label">Profile</span></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: POST ══ -->
+    <div class="screen hidden" id="screen-post">
+      <div class="post-header">
+        <div class="post-title">Post Opportunity</div>
+        <div style="font-size:13px;color:#4d7fff;cursor:pointer;font-weight:700;" onclick="navigateTo('map')">Cancel</div>
+      </div>
+      <div class="post-scroll">
+        <div class="post-label">Type <span class="req">*</span></div>
+        <div class="post-type-row">
+          <div class="post-type sel-j" id="ptype-job" onclick="selectPostType('job')"><i class="ti ti-briefcase" style="color:#4d7fff"></i><span>Job</span></div>
+          <div class="post-type" id="ptype-vol" onclick="selectPostType('vol')"><i class="ti ti-heart" style="color:var(--txt3)"></i><span>Volunteer</span></div>
+          <div class="post-type" id="ptype-act" onclick="selectPostType('act')"><i class="ti ti-camera" style="color:var(--txt3)"></i><span>Activity</span></div>
+        </div>
+        <div class="post-label">Title <span class="req">*</span></div>
+        <input class="post-input" id="postTitle" type="text" placeholder="e.g. Senior UX Designer" maxlength="60" oninput="clearPostErr(this)">
+        <div class="post-label">Organization <span class="req">*</span></div>
+        <input class="post-input" id="postOrg" type="text" placeholder="Company or NGO name" maxlength="60" oninput="clearPostErr(this)">
+        <div class="post-label">Location</div>
+        <input class="post-input" id="postLocation" type="text" placeholder="Address or area" maxlength="80">
+        <div class="post-label">Description <span class="req">*</span></div>
+        <textarea class="post-textarea" id="postDesc" placeholder="Describe the opportunity…" maxlength="300" oninput="updateCharCount(this,'postDescCount',300);clearPostErr(this)"></textarea>
+        <div class="post-char"><span id="postDescCount">0</span>/300</div>
+        <div class="post-label">Compensation</div>
+        <input class="post-input" id="postPay" type="text" placeholder="Salary, certificate, or price" maxlength="40">
+        <button class="post-submit" onclick="submitPost()"><i class="ti ti-send"></i> Publish</button>
+      </div>
+      <div class="success-overlay" id="postSuccess">
+        <div class="success-check"><i class="ti ti-check"></i></div>
+        <div class="success-title">Published! 🎉</div>
+        <div class="success-sub">Your opportunity is now live on the map.</div>
+        <div class="success-close" onclick="closePostSuccess()">View on Map</div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: SAVED ══ -->
+    <div class="screen hidden" id="screen-saved">
+      <div class="saved-scroll">
+        <div class="saved-header">
+          <div class="saved-title">Saved</div>
+          <div class="saved-subtitle" id="savedCount">0 saved items</div>
+        </div>
+        <div id="savedList">
+          <div class="saved-empty">
+            <i class="ti ti-bookmark"></i>
+            <p>No saved items yet.<br>Tap the bookmark icon on any listing to save it here.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="bnav-item" onclick="navigateTo('map')"><i class="ti ti-map-2"></i><span class="bnav-label">Map</span></div>
+        <div class="bnav-item" onclick="navigateTo('explore')"><i class="ti ti-search"></i><span class="bnav-label">Explore</span></div>
+        <div class="bnav-item" onclick="navigateTo('post')"><i class="ti ti-plus"></i><span class="bnav-label">Post</span></div>
+        <div class="bnav-item" onclick="navigateTo('alerts')"><i class="ti ti-bell"></i><span class="bnav-label">Alerts</span></div>
+        <div class="bnav-item active"><i class="ti ti-bookmark"></i><span class="bnav-label">Saved</span></div>
+      </div>
+    </div>
+
+  </div><!-- /screen-wrap -->
+</div><!-- /app-shell -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="ti" id="toastIcon" style="color:#4d7fff"></i>
+  <span id="toastMsg">Message</span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE MACHINE
+// ══════════════════════════════════════════════════════
+let currentScreen = 'intro';
+let screenHistory = [];
+let currentUser = { name: 'Ani Petrosyan', city: 'UX Designer · Yerevan' };
+let savedItems = {};
+let commentCount = 2;
+let unreadCount = 2;
+let currentPostType = 'job';
+let currentFilter = 'all';
+let exploreSearchTerm = '';
+let currentDetailId = 'l1';
+
+const TAB_SCREENS = ['map','explore','profile','alerts','post','saved'];
+const SLIDE_SCREENS = ['detail','auth'];
+
+const allListings = [
+  {id:'l1',type:'job',icon:'ti-briefcase',color:'#4d7fff',bg:'rgba(0,64,255,.18)',title:'Senior UX Designer',org:'Picsart · Full-time',tags:['Figma','UI/UX'],dist:'8 min',pay:'֏450k',featured:true,desc:"We're looking for a senior UX designer to lead mobile experiences. 3+ years Figma, strong portfolio required. Remote-friendly.",salary:'֏450,000/mo',company:'Picsart',location:'Yerevan, Armenia',chip:'Full-time job',chipIcon:'ti-briefcase',chipColor:'rgba(0,64,255,.18)',chipTxt:'#4d7fff'},
+  {id:'l2',type:'vol',icon:'ti-leaf',color:'#00c986',bg:'rgba(0,201,134,.15)',title:'Park Cleanup',org:'EcoYerevan · Volunteer',tags:['Certificate'],dist:'5 min',pay:'Free',featured:false,desc:'Join us for a community park cleanup in central Yerevan. Gloves and bags provided. Certificate awarded after 3 sessions.',salary:'Free · Certificate',company:'EcoYerevan',location:'Yerevan, Armenia',chip:'Volunteer',chipIcon:'ti-heart',chipColor:'rgba(0,201,134,.15)',chipTxt:'#00c986'},
+  {id:'l3',type:'act',icon:'ti-camera',color:'#ff8c42',bg:'rgba(255,107,0,.15)',title:'City Walking Tour',org:'Yerevan Explore · Activity',tags:['Guided'],dist:'3 min',pay:'֏3,500',featured:true,desc:'A guided 2-hour walking tour through historic Yerevan. Discover hidden streets, cafes and stories of the city.',salary:'֏3,500',company:'Yerevan Explore',location:'Northern Ave, Yerevan',chip:'Activity',chipIcon:'ti-camera',chipColor:'rgba(255,107,0,.15)',chipTxt:'#ff8c42'},
+  {id:'l4',type:'job',icon:'ti-code',color:'#4d7fff',bg:'rgba(0,64,255,.18)',title:'Frontend Engineer',org:'TeamLead · Remote',tags:['React','TS'],dist:'12 min',pay:'֏380k',featured:false,desc:'Build modern React apps in a fast-moving startup environment. TypeScript, React 18+, and GraphQL experience preferred.',salary:'֏380,000/mo',company:'TeamLead',location:'Remote · Yerevan',chip:'Full-time job',chipIcon:'ti-briefcase',chipColor:'rgba(0,64,255,.18)',chipTxt:'#4d7fff'},
+  {id:'l5',type:'vol',icon:'ti-tree',color:'#00c986',bg:'rgba(0,201,134,.15)',title:'Tree Planting Drive',org:'GreenArm · Volunteer',tags:['Weekend'],dist:'18 min',pay:'Free',featured:false,desc:'Help plant 500 trees around Yerevan parks this spring. Weekend event, no experience needed.',salary:'Free',company:'GreenArm',location:'Yerevan Parks',chip:'Volunteer',chipIcon:'ti-heart',chipColor:'rgba(0,201,134,.15)',chipTxt:'#00c986'},
+  {id:'l6',type:'job',icon:'ti-palette',color:'#4d7fff',bg:'rgba(0,64,255,.18)',title:'Graphic Designer',org:'Digitain · Full-time',tags:['Adobe','Motion'],dist:'6 min',pay:'֏280k',featured:false,desc:'Create visual content for iGaming brand across social, product and print. Adobe Creative Suite required.',salary:'֏280,000/mo',company:'Digitain',location:'Yerevan, Armenia',chip:'Full-time job',chipIcon:'ti-briefcase',chipColor:'rgba(0,64,255,.18)',chipTxt:'#4d7fff'},
+];
+let postedListings = [];
+
+// ══════════════════════════════════════════════════════
+// CORE NAVIGATION
+// ══════════════════════════════════════════════════════
+function navigateTo(screen, params={}) {
+  if (screen === currentScreen) return;
+  const isBack = screenHistory.length > 0 && screenHistory[screenHistory.length-1] === screen;
+  const isSlide = SLIDE_SCREENS.includes(screen);
+  const isSlideBack = isBack && SLIDE_SCREENS.includes(currentScreen);
+
+  const prevEl = document.getElementById('screen-' + currentScreen);
+  if (prevEl) prevEl.classList.add('hidden');
+
+  if (!isBack) {
+    screenHistory.push(currentScreen);
+    if (screenHistory.length > 20) screenHistory.shift();
+  } else {
+    screenHistory.pop();
+  }
+  currentScreen = screen;
+
+  const nextEl = document.getElementById('screen-' + screen);
+  if (!nextEl) return;
+  nextEl.classList.remove('hidden');
+  nextEl.classList.remove('slide-enter','slide-enter-back','fade-enter');
+  void nextEl.offsetWidth;
+  if (isSlideBack) nextEl.classList.add('slide-enter-back');
+  else if (isSlide) nextEl.classList.add('slide-enter');
+  else nextEl.classList.add('fade-enter');
+
+  if (screen === 'explore') renderExplore();
+  if (screen === 'detail') renderDetailScreen(params.id || currentDetailId);
+  if (screen === 'saved') renderSavedScreen();
+  if (screen === 'auth') switchAuthTab(params.mode === 'signup' ? 'signup' : 'login');
+  if (screen === 'map') requestAnimationFrame(() => requestAnimationFrame(initGisMap));
+}
+
+function goBack() {
+  if (screenHistory.length === 0) { navigateTo('intro'); return; }
+  const prev = screenHistory[screenHistory.length-1];
+  navigateTo(prev);
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER: DETAIL SCREEN
+// ══════════════════════════════════════════════════════
+function renderDetailScreen(id) {
+  currentDetailId = id || 'l1';
+  const item = allListings.find(l => l.id === currentDetailId) || allListings[0];
+  const isSaved = !!savedItems[currentDetailId];
+  const el = document.getElementById('screen-detail');
+  el.scrollTop = 0;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-map-thumb">
+      <div class="map-bg" style="opacity:.6"></div>
+      <div class="map-road-h" style="top:45%;height:5px;opacity:.5;left:0;right:0"></div>
+      <div class="map-road-v" style="left:50%;width:4px;opacity:.5"></div>
+      <div class="my-ring" style="left:48%;top:60%"></div>
+      <div class="my-dot" style="left:48%;top:60%"></div>
+      <div class="map-pin" style="left:55%;top:35%">
+        <div class="pin-dot" style="background:${item.color};padding:6px 12px"><i class="ti ${item.icon}" style="font-size:12px;margin-right:3px"></i>${item.company}</div>
+        <div class="pin-stem" style="background:${item.color}"></div>
+      </div>
+      <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 360 220">
+        <path d="M173 176 Q155 154 143 130 Q130 108 120 86 Q112 70 128 58" stroke="${item.color}" stroke-width="2.5" stroke-dasharray="5 4" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="detail-back" onclick="goBack()"><i class="ti ti-chevron-left"></i></div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-chip" style="background:${item.chipColor};color:${item.chipTxt}">
+        <i class="ti ${item.chipIcon}" style="font-size:12px"></i>${item.chip}
+      </div>
+      <div class="detail-title">${item.title}</div>
+      <div class="detail-org">${item.company} · ${item.location}</div>
+      <div class="detail-meta-row">
+        <div class="dmeta"><i class="ti ti-walk"></i><span>${item.dist} walk</span></div>
+        <div class="dmeta"><i class="ti ti-currency-dollar"></i><span>${item.salary}</span></div>
+        <div class="dmeta"><i class="ti ti-star" style="color:var(--gold)"></i><span>4.9 · 24 reviews</span></div>
+      </div>
+      <div class="detail-divider"></div>
+      <div class="detail-section-label">Employer trust</div>
+      <div class="trust-row">
+        <div class="trust-av"><i class="ti ti-building"></i></div>
+        <div><div style="font-size:12px;color:var(--txt2);margin-bottom:1px">Trust score</div><div class="trust-score">96</div></div>
+        <div class="trust-badge" style="margin-left:8px"><div class="tbadge tbadge-v">ID Verified</div><div class="tbadge tbadge-b">Verified</div><div class="tbadge tbadge-v">32 hires</div></div>
+      </div>
+      <div class="detail-divider"></div>
+      <div class="detail-section-label">Description</div>
+      <div style="font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:16px;">${item.desc}</div>
+      <div class="detail-divider"></div>
+      <div class="detail-section-label">Comments <span style="color:var(--txt3);font-weight:400;" id="commentCountLabel">(${commentCount})</span></div>
+      <div class="comments-section">
+        <div class="comment-input-row">
+          <div class="comment-av-sm"><i class="ti ti-user"></i></div>
+          <div class="comment-input-wrap">
+            <textarea class="comment-inp" id="commentInput" placeholder="Write a comment…" maxlength="280"></textarea>
+            <button class="comment-send-btn" onclick="postComment()"><i class="ti ti-send"></i></button>
+          </div>
+        </div>
+        <div id="commentsList">
+          <div class="comment-item">
+            <div class="ci-av"><i class="ti ti-user"></i></div>
+            <div class="ci-body">
+              <div class="ci-head"><span class="ci-name">Aram M.</span><span class="ci-time">2 hr ago</span></div>
+              <div class="ci-text">Great company to work for! Very modern office and nice team culture.</div>
+              <div class="ci-like" onclick="toggleLike(this)"><i class="ti ti-heart"></i><span>4</span></div>
+            </div>
+          </div>
+          <div class="comment-item">
+            <div class="ci-av" style="background:rgba(0,201,134,.15)"><i class="ti ti-user" style="color:#00c986"></i></div>
+            <div class="ci-body">
+              <div class="ci-head"><span class="ci-name">Nare K.</span><span class="ci-time">5 hr ago</span></div>
+              <div class="ci-text">Applied last week. The interview process was smooth and professional.</div>
+              <div class="ci-like" onclick="toggleLike(this)"><i class="ti ti-heart"></i><span>7</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="height:120px"></div>
+    </div>
+    <div class="apply-bar">
+      <div class="apply-save" id="detailSaveBtn" onclick="toggleSave(this,'${item.id}')" style="${isSaved?'background:rgba(0,64,255,.2);border-color:rgba(0,64,255,.5);':''}">
+        <i class="ti ${isSaved?'ti-bookmark-filled':'ti-bookmark'}" style="${isSaved?'color:#4d7fff':''}"></i>
+      </div>
+      <div class="apply-btn" onclick="openApplyModal()"><i class="ti ti-send" style="font-size:16px;margin-right:8px"></i>Quick Apply</div>
+    </div>
+    <!-- Apply Modal -->
+    <div class="apply-modal" id="applyModal">
+      <div class="apply-modal-inner">
+        <div class="apply-modal-title">Apply to ${item.company}</div>
+        <div class="apply-modal-sub">${item.title} · ${item.chip}</div>
+        <div class="apply-modal-field"><div class="apply-modal-label">Cover note <span style="color:#ff3b30">*</span></div><textarea class="apply-modal-textarea" id="applyNote" placeholder="Tell them why you're a great fit…"></textarea></div>
+        <div class="apply-modal-field"><div class="apply-modal-label">Portfolio / LinkedIn URL</div><input class="apply-modal-input" id="applyUrl" type="url" placeholder="https://..."></div>
+        <button class="apply-modal-btn" onclick="submitApply()"><i class="ti ti-send"></i> Send Application</button>
+        <button class="apply-modal-cancel" onclick="closeApplyModal()">Cancel</button>
+      </div>
+    </div>
+    <div class="success-overlay" id="successOverlay">
+      <div class="success-check"><i class="ti ti-check"></i></div>
+      <div class="success-title">Applied! 🎉</div>
+      <div class="success-sub">Your application was sent to ${item.company} successfully.</div>
+      <div class="success-close" onclick="navigateTo('map')">Back to Map</div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER: SAVED SCREEN
+// ══════════════════════════════════════════════════════
+function renderSavedScreen() {
+  const keys = Object.keys(savedItems);
+  const count = document.getElementById('savedCount');
+  const list = document.getElementById('savedList');
+  if (count) count.textContent = keys.length + ' saved item' + (keys.length !== 1 ? 's' : '');
+  if (!list) return;
+  if (keys.length === 0) {
+    list.innerHTML = '<div class="saved-empty"><i class="ti ti-bookmark"></i><p>No saved items yet.<br>Tap the bookmark icon on any listing to save it here.</p></div>';
+    return;
+  }
+  list.innerHTML = keys.map(id => {
+    const item = allListings.find(l => l.id === id);
+    if (!item) return '';
+    return `<div class="saved-item" onclick="navigateTo('detail',{id:'${id}'})">
+      <div class="saved-item-icon" style="background:${item.bg}"><i class="ti ${item.icon}" style="color:${item.color}"></i></div>
+      <div style="flex:1"><div class="saved-item-title">${item.title}</div><div class="saved-item-sub">${item.org}</div></div>
+      <div class="saved-item-remove" onclick="event.stopPropagation();removeSaved('${id}')"><i class="ti ti-x"></i></div>
+    </div>`;
+  }).join('');
+}
+
+function removeSaved(id) {
+  delete savedItems[id];
+  showToast('Removed from saved','ti-trash','#ff6b00');
+  renderSavedScreen();
+}
+
+// ══════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════
+function switchAuthTab(tab) {
+  document.getElementById('loginPanel').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signupPanel').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tabLogin').className = 'auth-tab' + (tab === 'login' ? ' active' : '');
+  document.getElementById('tabSignup').className = 'auth-tab' + (tab === 'signup' ? ' active' : '');
+}
+function selectRole(r) {
+  document.getElementById('rc-seeker').className = 'rc' + (r === 'seeker' ? ' sel' : '');
+  document.getElementById('rc-employer').className = 'rc' + (r === 'employer' ? ' sel' : '');
+}
+function togglePass(id, el) {
+  const f = document.getElementById(id);
+  if (f.type === 'password') { f.type = 'text'; el.className = 'ti ti-eye-off input-eye'; }
+  else { f.type = 'password'; el.className = 'ti ti-eye input-eye'; }
+}
+function clearFieldErr(input) { input.classList.remove('err'); }
+function showFieldErr(id, errId) {
+  const f = document.getElementById(id), e = document.getElementById(errId);
+  if (f) f.classList.add('err');
+  if (e) { e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 3000); }
+}
+function checkPassStrength(val) {
+  const bars = [document.getElementById('ps1'), document.getElementById('ps2'), document.getElementById('ps3')];
+  const lbl = document.getElementById('psLabel');
+  bars.forEach(b => b.className = 'ps-bar');
+  if (!val) { if (lbl) lbl.textContent = ''; return; }
+  let strength = 0;
+  if (val.length >= 8) strength++;
+  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) strength++;
+  if (/[^A-Za-z0-9]/.test(val)) strength++;
+  const cls = ['weak','med','strong'];
+  const labels = ['Weak','Medium','Strong'];
+  for (let i = 0; i < strength; i++) bars[i].classList.add(cls[strength-1]);
+  if (lbl) { lbl.textContent = labels[strength-1] || ''; lbl.style.color = strength === 1 ? '#ff3b30' : strength === 2 ? '#ffaa00' : '#00c986'; }
+}
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  let ok = true;
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { showFieldErr('loginEmail','loginEmailErr'); ok = false; }
+  if (!pass) { showFieldErr('loginPass','loginPassErr'); ok = false; }
+  if (!ok) return;
+  showToast('Signing in…','ti-loader','#4d7fff');
+  setTimeout(() => navigateTo('map'), 900);
+}
+function doSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass = document.getElementById('signupPass').value;
+  let ok = true;
+  if (!name) { showFieldErr('signupName','signupNameErr'); ok = false; }
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { showFieldErr('signupEmail','signupEmailErr'); ok = false; }
+  if (!pass || pass.length < 8) { showFieldErr('signupPass','signupPassErr'); ok = false; }
+  if (!ok) return;
+  currentUser.name = name;
+  document.getElementById('pfName').textContent = name;
+  showToast('Creating account…','ti-loader','#4d7fff');
+  setTimeout(() => navigateTo('map'), 900);
+}
+function doLogout() {
+  showToast('Signed out successfully','ti-logout','#ff3b30');
+  setTimeout(() => { screenHistory = []; navigateTo('intro'); }, 900);
+}
+
+// ══════════════════════════════════════════════════════
+// EXPLORE
+// ══════════════════════════════════════════════════════
+function selectCat(el, cat) {
+  el.closest('.cat-scroll').querySelectorAll('.cat-chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  currentFilter = cat;
+  renderExplore();
+}
+function filterListings(val) {
+  exploreSearchTerm = val.toLowerCase();
+  renderExplore();
+}
+function renderExplore() {
+  const list = document.getElementById('exploreList');
+  if (!list) return;
+  const allItems = [...allListings, ...postedListings];
+  let items = allItems.filter(item => {
+    const matchType = currentFilter === 'all' || (currentFilter === 'featured' && item.featured) || (currentFilter === 'job' && item.type === 'job') || (currentFilter === 'vol' && item.type === 'vol') || (currentFilter === 'act' && item.type === 'act');
+    const matchSearch = !exploreSearchTerm || (item.title + item.org).toLowerCase().includes(exploreSearchTerm);
+    return matchType && matchSearch;
+  });
+  const label = document.getElementById('exploreLabel');
+  if (label) label.textContent = exploreSearchTerm ? `Results for "${exploreSearchTerm}"` : (currentFilter === 'featured' ? 'Featured' : 'Near You · 5km');
+  if (items.length === 0) { list.innerHTML = '<div class="no-results"><i class="ti ti-search-off"></i>No results found.<br>Try a different keyword.</div>'; return; }
+  list.innerHTML = items.map(item => `
+    <div class="exp-card" onclick="navigateTo('detail',{id:'${item.id}'})">
+      <div class="exp-icon ${item.type === 'job' ? 'j' : item.type === 'vol' ? 'v' : 'a'}" style="background:${item.bg}"><i class="ti ${item.icon}" style="font-size:24px;color:${item.color}"></i></div>
+      <div class="exp-info">
+        <div class="exp-title">${item.title}</div>
+        <div class="exp-sub">${item.org}</div>
+        <div class="exp-tags">${item.tags.map(t => `<span class="exp-tag" style="background:${item.bg};color:${item.color}">${t}</span>`).join('')}</div>
+      </div>
+      <div class="exp-right"><div class="exp-dist" style="color:${item.color}">${item.dist}</div><div class="exp-pay">${item.pay}</div></div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// MAP FILTER
+// ══════════════════════════════════════════════════════
+function toggleFilter(el, type) {
+  const map = { j:'on-j', v:'on-v', a:'on-a' };
+  const cls = map[type];
+  if (el.classList.contains(cls)) el.classList.remove(cls);
+  else el.classList.add(cls);
+}
+
+// ══════════════════════════════════════════════════════
+// DETAIL ACTIONS
+// ══════════════════════════════════════════════════════
+function toggleSave(btn, id) {
+  const item = allListings.find(l => l.id === id);
+  if (!item) return;
+  if (savedItems[id]) {
+    delete savedItems[id];
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.innerHTML = '<i class="ti ti-bookmark"></i>';
+    showToast('Removed from saved','ti-bookmark','#fff');
+  } else {
+    savedItems[id] = item;
+    btn.style.background = 'rgba(0,64,255,.2)';
+    btn.style.borderColor = 'rgba(0,64,255,.5)';
+    btn.innerHTML = '<i class="ti ti-bookmark-filled" style="color:#4d7fff"></i>';
+    showToast('Saved!','ti-bookmark-filled','#4d7fff');
+  }
+}
+function openApplyModal() {
+  const m = document.getElementById('applyModal');
+  if (m) m.classList.add('show');
+}
+function closeApplyModal() {
+  const m = document.getElementById('applyModal');
+  if (m) m.classList.remove('show');
+}
+function submitApply() {
+  const note = document.getElementById('applyNote');
+  if (!note || !note.value.trim()) { showToast('Please add a cover note','ti-alert-circle','#ff6b00'); return; }
+  closeApplyModal();
+  const s = document.getElementById('successOverlay');
+  if (s) s.classList.add('show');
+}
+function toggleLike(el) {
+  el.classList.toggle('liked');
+  const span = el.querySelector('span');
+  span.textContent = el.classList.contains('liked') ? parseInt(span.textContent)+1 : parseInt(span.textContent)-1;
+}
+function postComment() {
+  const inp = document.getElementById('commentInput');
+  if (!inp || !inp.value.trim()) return;
+  commentCount++;
+  const lbl = document.getElementById('commentCountLabel');
+  if (lbl) lbl.textContent = `(${commentCount})`;
+  const list = document.getElementById('commentsList');
+  if (!list) return;
+  const div = document.createElement('div');
+  div.className = 'comment-item slide-in';
+  div.innerHTML = `<div class="ci-av" style="background:rgba(0,64,255,.2)"><i class="ti ti-user" style="color:#4d7fff"></i></div><div class="ci-body"><div class="ci-head"><span class="ci-name">${currentUser.name}</span><span class="ci-time">Just now</span></div><div class="ci-text">${inp.value.trim()}</div><div class="ci-like" onclick="toggleLike(this)"><i class="ti ti-heart"></i><span>0</span></div></div>`;
+  list.insertBefore(div, list.firstChild);
+  inp.value = '';
+  inp.style.height = '38px';
+}
+
+// ══════════════════════════════════════════════════════
+// POST FORM
+// ══════════════════════════════════════════════════════
+function selectPostType(type) {
+  currentPostType = type;
+  ['job','vol','act'].forEach(t => {
+    const el = document.getElementById('ptype-' + t);
+    if (el) el.className = 'post-type' + (t === type ? ` sel-${t === 'job' ? 'j' : t === 'vol' ? 'v' : 'a'}` : '');
+    if (el) {
+      const icon = el.querySelector('i');
+      if (icon) icon.style.color = t === type ? (t === 'job' ? '#4d7fff' : t === 'vol' ? '#00c986' : '#ff8c42') : 'var(--txt3)';
+    }
+  });
+}
+function clearPostErr(el) { el.classList.remove('perr'); }
+function updateCharCount(el, countId, max) { const c = document.getElementById(countId); if (c) c.textContent = el.value.length; }
+function submitPost() {
+  const title = document.getElementById('postTitle').value.trim();
+  const org = document.getElementById('postOrg').value.trim();
+  const desc = document.getElementById('postDesc').value.trim();
+  let ok = true;
+  if (!title) { document.getElementById('postTitle').classList.add('perr'); ok = false; }
+  if (!org) { document.getElementById('postOrg').classList.add('perr'); ok = false; }
+  if (!desc) { document.getElementById('postDesc').classList.add('perr'); ok = false; }
+  if (!ok) { showToast('Please fill required fields','ti-alert-circle','#ff6b00'); return; }
+  const newId = 'p' + Date.now();
+  const typeMap = { job:{icon:'ti-briefcase',color:'#4d7fff',bg:'rgba(0,64,255,.18)'}, vol:{icon:'ti-heart',color:'#00c986',bg:'rgba(0,201,134,.15)'}, act:{icon:'ti-camera',color:'#ff8c42',bg:'rgba(255,107,0,.15)'} };
+  const t = typeMap[currentPostType];
+  postedListings.push({ id:newId, type:currentPostType, icon:t.icon, color:t.color, bg:t.bg, title, org, tags:[currentPostType === 'job' ? 'New' : 'Community'], dist:'0 min', pay: document.getElementById('postPay').value || 'TBD', featured:false, desc, salary: document.getElementById('postPay').value || 'TBD', company:org, location: document.getElementById('postLocation').value || 'Yerevan', chip: currentPostType === 'job' ? 'Job' : currentPostType === 'vol' ? 'Volunteer' : 'Activity', chipIcon:t.icon, chipColor:t.bg, chipTxt:t.color });
+  const s = document.getElementById('postSuccess');
+  if (s) s.classList.add('show');
+}
+function closePostSuccess() {
+  const s = document.getElementById('postSuccess');
+  if (s) s.classList.remove('show');
+  ['postTitle','postOrg','postDesc','postPay','postLocation'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('postDescCount').textContent = '0';
+  selectPostType('job');
+  navigateTo('map');
+}
+
+// ══════════════════════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════════════════════
+function updateAlertBadge() {
+  const badge = document.getElementById('alertBadge');
+  if (badge) badge.style.display = unreadCount > 0 ? 'block' : 'none';
+}
+function readAlert(el, msg) {
+  if (el.classList.contains('unread')) {
+    el.classList.remove('unread');
+    const dot = el.querySelector('.alert-dot');
+    if (dot) dot.remove();
+    unreadCount = Math.max(0, unreadCount-1);
+    updateAlertBadge();
+  }
+  if (msg) showToast(msg,'ti-check','#00c986');
+}
+function markAllRead() {
+  document.querySelectorAll('.alert-item.unread').forEach(el => {
+    el.classList.remove('unread');
+    const dot = el.querySelector('.alert-dot');
+    if (dot) dot.remove();
+  });
+  unreadCount = 0;
+  updateAlertBadge();
+  showToast('All notifications read','ti-check','#00c986');
+}
+function addNotification(title, body, avClass, icon) {
+  unreadCount++;
+  updateAlertBadge();
+  const list = document.getElementById('alertsList');
+  if (!list) return;
+  const div = document.createElement('div');
+  div.className = 'alert-item unread slide-in';
+  div.onclick = function() { readAlert(this, title); };
+  div.innerHTML = `<div class="alert-av ${avClass}"><i class="ti ${icon}" style="font-size:19px;color:${avClass === 'blue' ? '#4d7fff' : avClass === 'green' ? '#00c986' : avClass === 'gold' ? '#ffaa00' : '#ff8c42'}"></i></div><div class="alert-content"><div class="alert-title">${title}</div><div class="alert-body">${body}</div><div class="alert-time">Just now</div></div><div class="alert-dot"></div>`;
+  list.insertBefore(div, list.firstChild);
+}
+
+// ══════════════════════════════════════════════════════
+// PROFILE EDIT
+// ══════════════════════════════════════════════════════
+function openEditProfile() { document.getElementById('editProfileOverlay').classList.add('show'); }
+function closeEditProfile() { document.getElementById('editProfileOverlay').classList.remove('show'); }
+function saveProfile() {
+  const name = document.getElementById('editName').value.trim();
+  const city = document.getElementById('editCity').value.trim();
+  if (!name) { showToast('Name cannot be empty','ti-alert-circle','#ff6b00'); return; }
+  currentUser.name = name;
+  currentUser.city = city;
+  document.getElementById('pfName').textContent = name;
+  document.getElementById('pfCity').textContent = city;
+  closeEditProfile();
+  showToast('Profile updated!','ti-check','#00c986');
+}
+
+// ══════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, icon, color) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = 'ti ' + icon;
+  document.getElementById('toastIcon').style.color = color || '#4d7fff';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ══════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════
+updateAlertBadge();
+renderExplore();
+
+// ══════════════════════════════════════════════════════
+// MAPBOX + SUPABASE REAL MAP
+// ══════════════════════════════════════════════════════
+var gisMap = null;
+var gisUserLat = null, gisUserLng = null, gisUserMarker = null;
+var gisFilter = "all", gisSearch = "";
+
+function loadScript(src, onload) {
+  var s = document.createElement('script');
+  s.src = src; s.onload = onload;
+  document.head.appendChild(s);
+}
+function loadCSS(href) {
+  var l = document.createElement('link');
+  l.rel = 'stylesheet'; l.href = href;
+  document.head.appendChild(l);
+}
+
+function initGisMap() {
+  if (gisMap) { gisMap.resize(); return; }
+
+  // If mapboxgl already loaded, go straight to init
+  if (typeof mapboxgl !== 'undefined' && window._supabaseClient) {
+    _buildMap(); return;
+  }
+
+  // Dynamically load Mapbox GL JS + Supabase, then init
+  loadCSS('https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css');
+  loadScript('https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', function() {
+    loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js', function() {
+      window._supabaseClient = supabase.createClient(
+        "https://atyqxqtkfusskyifxawi.supabase.co",
+        "sb_publishable_KpIroQLZqAztUn5Mhm_Q5g_11zNyAHe"
+      );
+      _buildMap();
+    });
+  });
+}
+
+function _buildMap() {
+  mapboxgl.accessToken = 'pk.eyJ1Ijoia2hvcmVuMDEiLCJhIjoiY21vaWN5MjNoMDE4cTJ0c2Z6NjB3aWdwZyJ9.j4cLAsmyQEGcdqd-kG0aqg';
+
+  const container = document.getElementById('mapbox-container');
+  container.style.position = 'absolute';
+  container.style.inset = '0';
+
+  gisMap = new mapboxgl.Map({
+    container: 'mapbox-container',
+    style: 'mapbox://styles/mapbox/navigation-guidance-night-v4',
+    center: [44.5, 40.2],
+    zoom: 10
+  });
+
+  gisMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+  gisMap.on('load', () => {
+    gisMap.addSource('posts', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+      cluster: true,
+      clusterRadius: 50
+    });
+
+    gisMap.addLayer({
+      id: 'clusters', type: 'circle', source: 'posts',
+      filter: ['has', 'point_count'],
+      paint: { 'circle-color': '#0040ff', 'circle-radius': 22, 'circle-opacity': .85 }
+    });
+    gisMap.addLayer({
+      id: 'cluster-count', type: 'symbol', source: 'posts',
+      filter: ['has', 'point_count'],
+      layout: { 'text-field': ['get', 'point_count'], 'text-size': 13 },
+      paint: { 'text-color': '#fff' }
+    });
+    gisMap.addLayer({
+      id: 'points', type: 'circle', source: 'posts',
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': ['match', ['get', 'category'],
+          'ներկում', '#0040ff',
+          'մաքրում', '#00c986',
+          'վարպետ', '#ff6b00',
+          '#999999'],
+        'circle-radius': 9,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ffffff'
+      }
+    });
+
+    gisMap.on('click', 'points', async (e) => {
+      const props = e.features[0].properties;
+      const coords = e.features[0].geometry.coordinates.slice();
+      var _pt = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+
+      // Store destination for route mode buttons
+      window._routeDest = { lng: coords[0], lat: coords[1] };
+      window._routeMode = window._routeMode || 'driving';
+
+      // Draw route with currently selected mode
+      drawRoute(coords[0], coords[1], window._routeMode);
+
+      let distHtml = '';
+      if (gisUserLat && gisUserLng) {
+        const dist = getGisDist(gisUserLat, gisUserLng, coords[1], coords[0]);
+        try {
+          const [driveRes, walkRes] = await Promise.all([
+            fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${gisUserLng},${gisUserLat};${coords[0]},${coords[1]}?access_token=${mapboxgl.accessToken}`),
+            fetch(`https://api.mapbox.com/directions/v5/mapbox/walking/${gisUserLng},${gisUserLat};${coords[0]},${coords[1]}?access_token=${mapboxgl.accessToken}`)
+          ]);
+          const [dd, wd] = await Promise.all([driveRes.json(), walkRes.json()]);
+          const dMin = dd.routes?.[0] ? Math.round(dd.routes[0].duration/60) : '?';
+          const wMin = wd.routes?.[0] ? Math.round(wd.routes[0].duration/60) : '?';
+          const isHy = currentLang === 'hy';
+          const minWord = isHy ? 'րոպե' : 'min';
+          distHtml = `
+            <div style="margin-top:10px;">
+              <p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,.5)">📍 ${dist.toFixed(1)} կմ</p>
+              <div style="display:flex;gap:6px;">
+                <button id="rb-drive" onclick="selectRouteMode('driving','${coords[0]}','${coords[1]}')" style="
+                  flex:1;padding:8px 6px;border-radius:10px;border:2px solid;cursor:pointer;
+                  font-size:12px;font-weight:700;font-family:var(--font-display);
+                  transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;
+                  background:${window._routeMode==='driving'?'#0040ff':'rgba(0,64,255,.12)'};
+                  border-color:${window._routeMode==='driving'?'#0040ff':'rgba(0,64,255,.35)'};
+                  color:${window._routeMode==='driving'?'#fff':'#4d7fff'};">
+                  🚗<span>${dMin} ${minWord}</span>
+                </button>
+                <button id="rb-walk" onclick="selectRouteMode('walking','${coords[0]}','${coords[1]}')" style="
+                  flex:1;padding:8px 6px;border-radius:10px;border:2px solid;cursor:pointer;
+                  font-size:12px;font-weight:700;font-family:var(--font-display);
+                  transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;
+                  background:${window._routeMode==='walking'?'#00c986':'rgba(0,201,134,.12)'};
+                  border-color:${window._routeMode==='walking'?'#00c986':'rgba(0,201,134,.35)'};
+                  color:${window._routeMode==='walking'?'#fff':'#00c986'};">
+                  🚶<span>${wMin} ${minWord}</span>
+                </button>
+              </div>
+            </div>`;
+        } catch(err) {
+          distHtml = `<p style="font-size:12px;margin-top:6px">📍 ${getGisDist(gisUserLat,gisUserLng,coords[1],coords[0]).toFixed(1)} կմ</p>`;
+        }
+      }
+
+      new mapboxgl.Popup({ offset: 12, maxWidth: '220px' })
+        .setLngLat(coords)
+        .setHTML(`
+          <h3 style="margin:0 0 4px;font-size:14px;">${props.text}</h3>
+          <span style="color:#00c986;font-size:11px">${_pt.popupCat}: ${props.category || _pt.popupNoAddr}</span>
+          ${distHtml}
+          <button class="delete-btn" style="margin-top:10px;width:100%;" onclick="deleteGisPost('${props.id}')">${_pt.popupDelete}</button>
+        `)
+        .addTo(gisMap);
+    });
+
+    gisMap.on('click', 'clusters', (e) => {
+      const features = gisMap.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+      const clusterId = features[0].properties.cluster_id;
+      gisMap.getSource('posts').getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) return;
+        gisMap.easeTo({ center: features[0].geometry.coordinates, zoom });
+      });
+    });
+
+    gisMap.on('click', (e) => {
+      const hits = gisMap.queryRenderedFeatures(e.point, { layers: ['points','clusters'] });
+      if (hits.length > 0) return;
+      const _mp = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+      const text = prompt(_mp.promptText);
+      if (!text) return;
+      const category = prompt(_mp.promptCat);
+      if (!category) return;
+      window._supabaseClient.from('posts').insert([{ lng: e.lngLat.lng, lat: e.lngLat.lat, text, category }])
+        .then(() => loadGisPosts());
+    });
+
+    gisMap.on('mouseenter', 'points', () => { gisMap.getCanvas().style.cursor = 'pointer'; });
+    gisMap.on('mouseleave', 'points', () => { gisMap.getCanvas().style.cursor = ''; });
+    gisMap.on('mouseenter', 'clusters', () => { gisMap.getCanvas().style.cursor = 'pointer'; });
+    gisMap.on('mouseleave', 'clusters', () => { gisMap.getCanvas().style.cursor = ''; });
+
+    loadGisPosts();
+    seedPostsIfEmpty();
+  });
+
+  // Location button
+  document.getElementById('gis-loc-btn').onclick = () => {
+    const _locBtn = document.getElementById('gis-loc-btn');
+    if (_locBtn) { _locBtn.style.opacity = '0.6'; _locBtn.style.pointerEvents = 'none'; }
+    navigator.geolocation.getCurrentPosition(pos => {
+      gisUserLng = pos.coords.longitude;
+      gisUserLat = pos.coords.latitude;
+
+      // Smooth fly to user location
+      gisMap.flyTo({
+        center: [gisUserLng, gisUserLat],
+        zoom: 15,
+        speed: 1.6,
+        curve: 1.4,
+        essential: true
+      });
+
+      // Remove old marker
+      if (gisUserMarker) gisUserMarker.remove();
+
+      // Build custom user-location marker with ant logo + pulse ring
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;width:80px;height:80px;display:flex;align-items:center;justify-content:center;';
+
+      // Pulsing ring
+      const ring = document.createElement('div');
+      ring.style.cssText = [
+        'position:absolute;',
+        'width:80px;height:80px;',
+        'border-radius:50%;',
+        'border:3px solid #0040ff;',
+        'animation:locPulse 1.6s ease-out infinite;',
+        'opacity:0.7;'
+      ].join('');
+      wrap.appendChild(ring);
+
+      // Second delayed ring
+      const ring2 = document.createElement('div');
+      ring2.style.cssText = [
+        'position:absolute;',
+        'width:80px;height:80px;',
+        'border-radius:50%;',
+        'border:2px solid rgba(0,64,255,0.4);',
+        'animation:locPulse 1.6s ease-out 0.5s infinite;',
+        'opacity:0.5;'
+      ].join('');
+      wrap.appendChild(ring2);
+
+      // Ant logo marker — no background circle
+      const dot = document.createElement('div');
+      dot.className = 'ant-marker';
+      dot.style.cssText = [
+        'position:relative;z-index:2;',
+        'width:64px;height:64px;',
+        'background:none;border:none;box-shadow:none;',
+        'background-image:url(\'https://atyqxqtkfusskyifxawi.supabase.co/storage/v1/object/public/nkar/logo-removebg-preview.png\');',
+        'background-size:contain;background-repeat:no-repeat;background-position:center;',
+        'filter:drop-shadow(0 4px 12px rgba(0,64,255,0.8)) drop-shadow(0 0 8px rgba(0,64,255,0.5));',
+        'cursor:default;'
+      ].join('');
+      wrap.appendChild(dot);
+
+      // Inject pulse keyframes if not already present
+      if (!document.getElementById('loc-pulse-style')) {
+        const st = document.createElement('style');
+        st.id = 'loc-pulse-style';
+        st.textContent = '@keyframes locPulse{0%{transform:scale(0.7);opacity:0.8}70%{transform:scale(1.4);opacity:0}100%{transform:scale(1.4);opacity:0}}';
+        document.head.appendChild(st);
+      }
+
+      gisUserMarker = new mapboxgl.Marker({ element: wrap, anchor: 'center' })
+        .setLngLat([gisUserLng, gisUserLat])
+        .addTo(gisMap);
+
+      if (_locBtn) { _locBtn.style.opacity = ''; _locBtn.style.pointerEvents = ''; }
+      loadGisPosts();
+    }, () => {
+      if (_locBtn) { _locBtn.style.opacity = ''; _locBtn.style.pointerEvents = ''; }
+      showToast((TRANSLATIONS[currentLang]||TRANSLATIONS['hy']).noLoc,'ti-alert-circle','#ff6b00');
+    }, { enableHighAccuracy: true, timeout: 10000 });
+  };
+
+  // Filter/search wiring
+  document.getElementById('gis-filter').onchange = (e) => { gisFilter = e.target.value; loadGisPosts(); };
+  document.getElementById('gis-search').oninput = (e) => { gisSearch = e.target.value.toLowerCase(); loadGisPosts(); };
+}
+
+function getGisDist(lat1,lon1,lat2,lon2) {
+  const R=6371,dL=(lat2-lat1)*Math.PI/180,dO=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dO/2)**2;
+  return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+async function loadGisPosts() {
+  const { data } = await window._supabaseClient.from('posts').select('*');
+  if (!data) return;
+
+  const filtered = data.filter(p => {
+    const okCat = gisFilter === 'all' || p.category === gisFilter;
+    const okSearch = p.text?.toLowerCase().includes(gisSearch);
+    return okCat && okSearch;
+  }).map(p => {
+    const lng=Number(p.lng), lat=Number(p.lat);
+    if(isNaN(lng)||isNaN(lat)) return null;
+    const dist = (gisUserLat&&gisUserLng) ? getGisDist(gisUserLat,gisUserLng,lat,lng) : 9999;
+    return {...p, lng, lat, dist};
+  }).filter(Boolean).sort((a,b)=>a.dist-b.dist);
+
+  // Update map source
+  if (gisMap && gisMap.getSource('posts')) {
+    gisMap.getSource('posts').setData({
+      type: 'FeatureCollection',
+      features: filtered.map(p => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+        properties: { id: p.id, text: p.text, category: p.category }
+      }))
+    });
+  }
+
+  // Update sidebar list
+  const list = document.getElementById('gis-list');
+  list.innerHTML = '';
+  filtered.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'listing-row';
+    const catIcon = p.category==='ներկում'?'ti-brush':p.category==='մաքրում'?'ti-leaf':'ti-tools';
+    const catColor = p.category==='ներկում'?'#4d7fff':p.category==='մաքրում'?'#00c986':'#ff8c42';
+    const catBg = p.category==='ներկում'?'rgba(0,64,255,.18)':p.category==='մաքրում'?'rgba(0,201,134,.15)':'rgba(255,107,0,.15)';
+    d.innerHTML = `
+      <div class="lr-icon" style="background:${catBg}"><i class="ti ${catIcon}" style="font-size:18px;color:${catColor}"></i></div>
+      <div><div class="lr-title">${p.text}</div><div class="lr-sub">${p.category||'—'}</div></div>
+      <div class="lr-right"><div class="lr-dist">${p.dist<9999?p.dist.toFixed(1)+' կմ':'—'}</div></div>
+    `;
+    d.onclick = () => { gisMap.flyTo({center:[p.lng,p.lat],zoom:15}); window._routeDest={lng:p.lng,lat:p.lat}; drawRoute(p.lng,p.lat, window._routeMode||'driving'); };
+    list.appendChild(d);
+  });
+}
+
+async function drawRoute(toLng, toLat, mode) {
+  if (!gisUserLng || !gisUserLat) return;
+  mode = mode || 'driving';
+  window._routeMode = mode;
+  const routeColor = mode === 'walking' ? '#00c986' : '#0040ff';
+  const url = `https://api.mapbox.com/directions/v5/mapbox/${mode}/${gisUserLng},${gisUserLat};${toLng},${toLat}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`;
+  const res = await fetch(url);
+  const json = await res.json();
+  if (!json.routes?.length) return;
+  const geojson = { type:'Feature', properties:{}, geometry:{ type:'LineString', coordinates: json.routes[0].geometry.coordinates } };
+  if (gisMap.getSource('route')) {
+    gisMap.getSource('route').setData(geojson);
+    if (gisMap.getLayer('route')) gisMap.setPaintProperty('route', 'line-color', routeColor);
+  } else {
+    gisMap.addSource('route', { type:'geojson', data: geojson });
+    gisMap.addLayer({ id:'route', type:'line', source:'route',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color': routeColor,'line-width':5,'line-opacity':.8}
+    });
+  }
+}
+
+// Called when user taps 🚗 or 🚶 button in popup
+window.selectRouteMode = function(mode, toLng, toLat) {
+  window._routeMode = mode;
+  drawRoute(parseFloat(toLng), parseFloat(toLat), mode);
+  // Update button styles
+  var driveBtn = document.getElementById('rb-drive');
+  var walkBtn  = document.getElementById('rb-walk');
+  if (driveBtn) {
+    driveBtn.style.background = mode==='driving' ? '#0040ff' : 'rgba(0,64,255,.12)';
+    driveBtn.style.borderColor = mode==='driving' ? '#0040ff' : 'rgba(0,64,255,.35)';
+    driveBtn.style.color = mode==='driving' ? '#fff' : '#4d7fff';
+  }
+  if (walkBtn) {
+    walkBtn.style.background = mode==='walking' ? '#00c986' : 'rgba(0,201,134,.12)';
+    walkBtn.style.borderColor = mode==='walking' ? '#00c986' : 'rgba(0,201,134,.35)';
+    walkBtn.style.color = mode==='walking' ? '#fff' : '#00c986';
+  }
+};
+
+window.deleteGisPost = async function(id) {
+  await window._supabaseClient.from('posts').delete().eq('id', id);
+  if (gisMap.getLayer('route')) gisMap.removeLayer('route');
+  if (gisMap.getSource('route')) gisMap.removeSource('route');
+  loadGisPosts();
+};
+
+// Map init is triggered by the map screen's own show logic (see navigateTo patch below)
+
+// ══════════════════════════════════════════════════════
+// SEED POSTS — insert if DB has fewer than 5 entries
+// ══════════════════════════════════════════════════════
+var SEED_POSTS = [
+  {lng:44.5136,lat:40.1872,text:'Բնակարանի ներկում',category:'ներկում'},
+  {lng:44.5214,lat:40.1931,text:'Մաքրման ծառայություն',category:'մաքրում'},
+  {lng:44.5089,lat:40.1796,text:'Կահույքի վարպետ',category:'վարպետ'},
+  {lng:44.5312,lat:40.1854,text:'Պատերի ներկում',category:'ներկում'},
+  {lng:44.5001,lat:40.2012,text:'Գրասենյակի մաքրում',category:'մաքրում'},
+  {lng:44.5178,lat:40.2089,text:'Սանտեխնիկ վարպետ',category:'վարպետ'},
+  {lng:44.4923,lat:40.1934,text:'Տան ներկում',category:'ներկում'},
+  {lng:44.5401,lat:40.1912,text:'Մաքրում հետ տեղափոխությունից',category:'մաքրում'},
+  {lng:44.5267,lat:40.2134,text:'Դռների ու պատուհանների ներկում',category:'ներկում'},
+  {lng:44.5055,lat:40.1845,text:'Էլեկտրիկ վարպետ',category:'վարպետ'},
+  {lng:44.4987,lat:40.2067,text:'Ամենօրյա մաքրում',category:'մաքրում'},
+  {lng:44.5345,lat:40.1978,text:'Առաստաղի ներկում',category:'ներկում'},
+  {lng:44.5123,lat:40.2023,text:'Կոյուղու վարպետ',category:'վարպետ'},
+  {lng:44.5234,lat:40.1789,text:'Մաքրում ՝ ըստ ժամի',category:'մաքրում'},
+  {lng:44.4956,lat:40.1901,text:'Մետաղ ու փայտ ներկող',category:'ներկում'},
+  {lng:44.5389,lat:40.2056,text:'Կահույք հավաքող վարպետ',category:'վարպետ'},
+  {lng:44.5067,lat:40.1967,text:'Տան խորը մաքրում',category:'մաքրում'},
+  {lng:44.5156,lat:40.1834,text:'Ճակատի ներկում',category:'ներկում'},
+  {lng:44.5289,lat:40.2078,text:'Տաքությունից ու ջրից վարպետ',category:'վարպետ'},
+  {lng:44.4912,lat:40.1856,text:'Աստիճաններ ու բակ մաքրող',category:'մաքրում'},
+  {lng:44.5445,lat:40.1923,text:'Ջրի մատակարարման վարպետ',category:'վարպետ'},
+  {lng:44.5198,lat:40.2156,text:'Մաքրում ՝ ամսական',category:'մաքրում'},
+  {lng:44.5078,lat:40.1912,text:'Ֆասադի ներկում',category:'ներկում'},
+];
+
+async function seedPostsIfEmpty() {
+  if (!window._supabaseClient) return;
+  const { data } = await window._supabaseClient.from('posts').select('id');
+  if (data && data.length < 5) {
+    await window._supabaseClient.from('posts').insert(SEED_POSTS);
+    loadGisPosts();
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// LANGUAGE SYSTEM — hy / en (full site translation)
+// ══════════════════════════════════════════════════════
+var currentLang = 'hy';
+
+var TRANSLATIONS = {
+  hy: {
+    // ── Map screen ──
+    searchPlaceholder: 'Փնտրիր հայտարարություն...',
+    filterAll: 'Բոլորը', filterPaint: 'Ներկում', filterClean: 'Մաքրում', filterMaster: 'Վարպետ',
+    locBtn: 'Իմ տեղը',
+    mapLoading: 'Քարտեզը բեռնվում է...',
+    noListings: 'Հայտարարություն չկա',
+    km: 'կմ', mins: 'րոպե',
+    catPainting: 'Ներկում', catCleaning: 'Մաքրում', catRepair: 'Վարպետ',
+    popupCat: 'Կատ', popupDelete: '🗑 Ջնջել', popupNoAddr: 'Նշված չէ',
+    noLoc: 'Չհաջողվեց գտնել տեղ',
+    promptText: 'Գրիր հայտարարությունը', promptCat: 'Կատեգորիա (ներկում / մաքրում / վարպետ)',
+    // ── Bottom nav ──
+    navMap: 'Քարտեզ', navExplore: 'Որոնել', navPost: 'Ավելացնել', navAlerts: 'Ծանուցում', navProfile: 'Պրոֆիլ',
+    // ── Intro screen ──
+    introTagline: 'Աշխատանք, կամավոր գործ և ակտիվություններ — ձեր քաղաքում։',
+    introPillJobs: 'Աշխատանք', introPillVol: 'Կամավոր', introPillAct: 'Ակտիվություն',
+    btnCreateAccount: 'Ստեղծել հաշիվ', btnSignIn: 'Մուտք', btnGuest: 'Շարունակել առանց գրանցման →',
+    // ── Auth screen ──
+    tabLogin: 'Մուտք', tabSignup: 'Գրանցում',
+    loginTitle: 'Բարի վերադարձ 👋', loginSub: 'Մուտք գործիր և գտիր հնարավորություններ կողքդ։',
+    emailPlaceholder: 'Էլ. հասցե', passPlaceholder: 'Գաղտնաբառ',
+    forgotPass: 'Մոռացե՞լ ես գաղտնաբառը',
+    btnLogin: 'Մուտք', orContinueWith: 'կամ շարունակիր',
+    noAccount: 'Հաշիվ չունե՞ս։', signUpLink: 'Գրանցվել',
+    signupTitle: 'Միացիր MrJoon.am-ին', signupSub: 'Ընտրիր դերդ՝ անհատականացնելու համար քո քարտեզը։',
+    roleSeeker: 'Աշխատանք փնտրող', roleSeekerDesc: 'Գտիր մոտ աշխատանք',
+    roleEmployer: 'Գործատու', roleEmployerDesc: 'Հրապարակիր ու վարձիր',
+    namePlaceholder: 'Անուն Ազգանուն', passMinPlaceholder: 'Գաղտնաբառ (min 8 նիշ)',
+    btnCreateAcc: 'Ստեղծել հաշիվ', orSignUpWith: 'կամ գրանցվիր',
+    haveAccount: 'Արդեն հաշիվ ունե՞ս։', signInLink: 'Մուտք',
+    passWeak: 'Թույլ', passMed: 'Միջին', passStrong: 'Ուժեղ',
+    errEmail: 'Մուտքագրիր ճիշտ էլ. հասցե', errPass: 'Գաղտնաբառ պարտադիր է',
+    errName: 'Մուտքագրիր անուն ազգանուն', errPass8: 'Գաղտնաբառը պետք է լինի min 8 նիշ',
+    signingIn: 'Մուտք ենք գործում…', creatingAcc: 'Ստեղծում ենք հաշիվ…',
+    signedOut: 'Ելք կատարվեց',
+    // ── Explore screen ──
+    exploreTitle: 'Որոնել',
+    exploreSearchPh: 'Փնտրիր աշխատանք, կամավոր, ակտիվություններ…',
+    catAll: 'Բոլորը', catJobs: 'Աշխատանք', catVol: 'Կամավոր', catAct: 'Ակտիվություն', catFeat: 'Ընտրված',
+    nearYou: 'Քեզ մոտ · 5կմ', featured: 'Ընտրված',
+    resultsFor: 'Արդյունքներ «{q}»-ի համար',
+    noResults: 'Արդյունք չկա։\nՓորձիր այլ բառ։',
+    // ── Profile screen ──
+    profileTitle: 'Պրոֆիլ',
+    badgeVerified: 'Հաստատված', badgeVolHrs: '12ժ կամավոր', badgeTopRated: 'Բարձր վարկանիշ',
+    editProfile: 'Խմբագրել',
+    trustHighly: 'Բարձր վստահություն', trustBasedOn: 'Հիմնված {n} կարծիքի վրա',
+    statReviews: 'Կարծիքներ', statVolHrs: 'Կամ. ժամ',
+    sectionCerts: 'Հավաստագրեր', sectionReviews: 'Կարծիքներ', sectionSettings: 'Կարգավորումներ',
+    settingsNotif: 'Ծանուցումներ', settingsNotifSub: 'Ազդանշաններ',
+    settingsPrivacy: 'Գաղտնիություն', settingsPrivacySub: 'Կառավարիր տվյալներդ',
+    settingsSignOut: 'Ելք', settingsSignOutSub: 'Ելք հաշվից',
+    editProfileTitle: 'Խմբագրել պրոֆիլ',
+    editLabelName: 'Անուն Ազգանուն', editLabelCity: 'Պաշտոն և քաղաք',
+    btnSaveChanges: 'Պահպանել', btnCancel: 'Չեղարկել',
+    profileUpdated: 'Պրոֆիլը թարմացվեց!', nameEmpty: 'Անունը չի կարող դատարկ լինել',
+    // ── Alerts screen ──
+    alertsTitle: 'Ծանուցումներ', markAllRead: 'Բոլորը կարդացված',
+    allRead: 'Բոլոր ծանուցումները կարդացված են',
+    // ── Post screen ──
+    postTitle: 'Հրապարակել',
+    postCancel: 'Չեղարկել',
+    postTypeLabel: 'Տեսակ', postTitleLabel: 'Վերնագիր', postOrgLabel: 'Կազմակերպություն',
+    postLocLabel: 'Վայր', postDescLabel: 'Նկարագրություն', postPayLabel: 'Վճար',
+    postTitlePh: 'Օր. Senior UX Designer',
+    postOrgPh: 'Ընկերության կամ ՀԿ-ի անուն',
+    postLocPh: 'Հասցե կամ թաղամաս',
+    postDescPh: 'Նկարագրիր հնարավորությունը…',
+    postPayPh: 'Աշխ. վարձ, հավաստ. կամ գին',
+    btnPublish: 'Հրապարակել',
+    postTypeJob: 'Աշխ.', postTypeVol: 'Կամ.', postTypeAct: 'Ակտ.',
+    publishedTitle: 'Հրապարակված! 🎉',
+    publishedSub: 'Հայտարարությունդ այժմ ցուցադրվում է քարտեզի վրա։',
+    viewOnMap: 'Տեսնել քարտեզում',
+    fillRequired: 'Լրացրու պարտադիր դաշտերը',
+    // ── Saved screen ──
+    savedTitle: 'Պահված', savedItems: '{n} պահված',
+    savedEmpty: 'Պահված ոչինչ չկա։\nՍեղմիր bookmark-ի պատկերակը՝ ցանկն ավելացնելու համար։',
+    removedSaved: 'Հեռացվեց պահվածներից',
+    // ── Detail screen ──
+    detailWalk: 'քայլ', detailTrustLabel: 'Վստահության մակ.', detailTrustScore: 'Վստահ. Հ.',
+    detailEmployer: 'Գործատուի վստահություն',
+    detailDesc: 'Նկարագրություն', detailComments: 'Մեկնաբ.',
+    commentPh: 'Գրիր մեկնաբանություն…',
+    btnQuickApply: 'Արագ դիմել',
+    applyModalSub: 'Ծածկ. նամակ',
+    applyNotePh: 'Պատմիր՝ ինչու ես հարմար…',
+    applyUrlPh: 'https://...',
+    applyUrlLabel: 'Պորտֆոլիո / LinkedIn',
+    btnSendApp: 'Ուղարկել դիմում',
+    appliedTitle: 'Դիմումն ուղարկված! 🎉',
+    appliedSub: 'Քո դիմումն ուղարկված է {company}-ին։',
+    backToMap: 'Վերադառնալ քարտեզ',
+    addCoverNote: 'Ավելացրու ծածկ. նամակ',
+    saved: 'Պահված!', removedFromSaved: 'Հեռացվեց',
+    // ── Misc toasts ──
+    toastPassReset: 'Գաղտնաբառի վերականգնման նամակ ուղարկված!',
+    toastGoogleLogin: 'Մուտք Google-ով…', toastAppleLogin: 'Մուտք Apple-ով…',
+    toastGoogleSignup: 'Գրանցում Google-ով…', toastAppleSignup: 'Գրանցում Apple-ով…',
+    certEco: 'Eco Volunteer Հավաստ.', certMentor: 'Youth Mentor Հավաստ.',
+    notifSettings: 'Ծանուցումների կարգ.', privacySettings: 'Գաղտնիության կարգ.',
+  },
+  en: {
+    // ── Map screen ──
+    searchPlaceholder: 'Search listings...',
+    filterAll: 'All', filterPaint: 'Painting', filterClean: 'Cleaning', filterMaster: 'Repair',
+    locBtn: 'My Location',
+    mapLoading: 'Loading map...',
+    noListings: 'No listings found',
+    km: 'km', mins: 'min',
+    catPainting: 'Painting', catCleaning: 'Cleaning', catRepair: 'Repair',
+    popupCat: 'Cat', popupDelete: '🗑 Delete', popupNoAddr: 'Not specified',
+    noLoc: 'Could not get location',
+    promptText: 'Enter listing title', promptCat: 'Category (painting / cleaning / repair)',
+    // ── Bottom nav ──
+    navMap: 'Map', navExplore: 'Explore', navPost: 'Post', navAlerts: 'Alerts', navProfile: 'Profile',
+    // ── Intro screen ──
+    introTagline: 'Your map for jobs, volunteer work & activities — right in your city.',
+    introPillJobs: 'Jobs', introPillVol: 'Volunteer', introPillAct: 'Activities',
+    btnCreateAccount: 'Create Account', btnSignIn: 'Sign In', btnGuest: 'Skip — Explore as guest →',
+    // ── Auth screen ──
+    tabLogin: 'Sign In', tabSignup: 'Sign Up',
+    loginTitle: 'Welcome back 👋', loginSub: 'Sign in to find opportunities near you.',
+    emailPlaceholder: 'Email address', passPlaceholder: 'Password',
+    forgotPass: 'Forgot password?',
+    btnLogin: 'Sign In', orContinueWith: 'or continue with',
+    noAccount: "Don't have an account?", signUpLink: 'Sign up',
+    signupTitle: 'Join MrJoon.am', signupSub: 'Choose your role to personalise your map.',
+    roleSeeker: 'Job Seeker', roleSeekerDesc: 'Find nearby work',
+    roleEmployer: 'Employer', roleEmployerDesc: 'Post & hire',
+    namePlaceholder: 'Full name', passMinPlaceholder: 'Password (min 8 characters)',
+    btnCreateAcc: 'Create Account', orSignUpWith: 'or sign up with',
+    haveAccount: 'Already have an account?', signInLink: 'Sign in',
+    passWeak: 'Weak', passMed: 'Medium', passStrong: 'Strong',
+    errEmail: 'Please enter a valid email address.', errPass: 'Password is required.',
+    errName: 'Please enter your full name.', errPass8: 'Password must be at least 8 characters.',
+    signingIn: 'Signing in…', creatingAcc: 'Creating account…',
+    signedOut: 'Signed out successfully',
+    // ── Explore screen ──
+    exploreTitle: 'Explore',
+    exploreSearchPh: 'Search jobs, volunteer, activities…',
+    catAll: 'All', catJobs: 'Jobs', catVol: 'Volunteer', catAct: 'Activities', catFeat: 'Featured',
+    nearYou: 'Near You · 5km', featured: 'Featured',
+    resultsFor: 'Results for "{q}"',
+    noResults: 'No results found.\nTry a different keyword.',
+    // ── Profile screen ──
+    profileTitle: 'Profile',
+    badgeVerified: 'Verified', badgeVolHrs: '12h volunteer', badgeTopRated: 'Top rated',
+    editProfile: 'Edit Profile',
+    trustHighly: 'Highly trusted', trustBasedOn: 'Based on {n} reviews',
+    statReviews: 'Total reviews', statVolHrs: 'Volunteer hrs',
+    sectionCerts: 'Certificates', sectionReviews: 'Reviews', sectionSettings: 'Settings',
+    settingsNotif: 'Notifications', settingsNotifSub: 'Alerts & updates',
+    settingsPrivacy: 'Privacy', settingsPrivacySub: 'Control your data',
+    settingsSignOut: 'Sign Out', settingsSignOutSub: 'Log out of your account',
+    editProfileTitle: 'Edit Profile',
+    editLabelName: 'Full Name', editLabelCity: 'Title & City',
+    btnSaveChanges: 'Save Changes', btnCancel: 'Cancel',
+    profileUpdated: 'Profile updated!', nameEmpty: 'Name cannot be empty',
+    // ── Alerts screen ──
+    alertsTitle: 'Notifications', markAllRead: 'Mark all read',
+    allRead: 'All notifications read',
+    // ── Post screen ──
+    postTitle: 'Post Opportunity',
+    postCancel: 'Cancel',
+    postTypeLabel: 'Type', postTitleLabel: 'Title', postOrgLabel: 'Organization',
+    postLocLabel: 'Location', postDescLabel: 'Description', postPayLabel: 'Compensation',
+    postTitlePh: 'e.g. Senior UX Designer',
+    postOrgPh: 'Company or NGO name',
+    postLocPh: 'Address or area',
+    postDescPh: 'Describe the opportunity…',
+    postPayPh: 'Salary, certificate, or price',
+    btnPublish: 'Publish',
+    postTypeJob: 'Job', postTypeVol: 'Volunteer', postTypeAct: 'Activity',
+    publishedTitle: 'Published! 🎉',
+    publishedSub: 'Your opportunity is now live on the map.',
+    viewOnMap: 'View on Map',
+    fillRequired: 'Please fill required fields',
+    // ── Saved screen ──
+    savedTitle: 'Saved', savedItems: '{n} saved item',
+    savedEmpty: 'No saved items yet.\nTap the bookmark icon on any listing to save it here.',
+    removedSaved: 'Removed from saved',
+    // ── Detail screen ──
+    detailWalk: 'walk', detailTrustLabel: 'Trust score', detailTrustScore: 'Trust score',
+    detailEmployer: 'Employer trust',
+    detailDesc: 'Description', detailComments: 'Comments',
+    commentPh: 'Write a comment…',
+    btnQuickApply: 'Quick Apply',
+    applyModalSub: 'Cover note',
+    applyNotePh: 'Tell them why you\'re a great fit…',
+    applyUrlPh: 'https://...',
+    applyUrlLabel: 'Portfolio / LinkedIn URL',
+    btnSendApp: 'Send Application',
+    appliedTitle: 'Applied! 🎉',
+    appliedSub: 'Your application was sent to {company} successfully.',
+    backToMap: 'Back to Map',
+    addCoverNote: 'Please add a cover note',
+    saved: 'Saved!', removedFromSaved: 'Removed from saved',
+    // ── Misc toasts ──
+    toastPassReset: 'Password reset email sent!',
+    toastGoogleLogin: 'Signing in with Google…', toastAppleLogin: 'Signing in with Apple…',
+    toastGoogleSignup: 'Signing up with Google…', toastAppleSignup: 'Signing up with Apple…',
+    certEco: 'Eco Volunteer Certificate', certMentor: 'Youth Mentor Certificate',
+    notifSettings: 'Notifications settings', privacySettings: 'Privacy settings',
+  }
+};
+
+// ─── Helper ───
+function t(key, vars) {
+  var str = (TRANSLATIONS[currentLang] || TRANSLATIONS['hy'])[key] || key;
+  if (vars) Object.keys(vars).forEach(k => { str = str.replace('{'+k+'}', vars[k]); });
+  return str;
+}
+
+function applyLang(lang) {
+  currentLang = lang;
+  var T = TRANSLATIONS[lang];
+
+  // ── lang button label (shows the OTHER language you can switch to) ──
+  var ll = document.getElementById('lang-label');
+  if (ll) ll.textContent = lang === 'hy' ? 'ENG' : 'ՀԱՅ';
+
+  // ── Map screen ──
+  var s = document.getElementById('gis-search');
+  if (s) s.placeholder = T.searchPlaceholder;
+  var f = document.getElementById('gis-filter');
+  if (f) {
+    f.options[0].text = T.filterAll;
+    f.options[1].text = T.filterPaint;
+    f.options[2].text = T.filterClean;
+    f.options[3].text = T.filterMaster;
+  }
+  var lb = document.getElementById('loc-btn-label');
+  if (lb) lb.textContent = T.locBtn;
+
+  // ── Bottom navs (all instances) ──
+  document.querySelectorAll('.bnav-label').forEach(function(el) {
+    var item = el.closest('.bnav-item');
+    if (!item) return;
+    var icon = item.querySelector('i');
+    if (!icon) return;
+    var cls = icon.className;
+    if (cls.includes('ti-map-2')) el.textContent = T.navMap;
+    else if (cls.includes('ti-search')) el.textContent = T.navExplore;
+    else if (cls.includes('ti-plus')) el.textContent = T.navPost;
+    else if (cls.includes('ti-bell')) el.textContent = T.navAlerts;
+    else if (cls.includes('ti-user')) el.textContent = T.navProfile;
+    else if (cls.includes('ti-bookmark')) el.textContent = T.navProfile; // saved nav
+  });
+
+  // ── Intro screen ──
+  var it = document.querySelector('.intro-tagline');
+  if (it) it.textContent = T.introTagline;
+  var pills = document.querySelectorAll('.intro-pill');
+  if (pills[0]) pills[0].innerHTML = '<i class="ti ti-briefcase"></i> ' + T.introPillJobs;
+  if (pills[1]) pills[1].innerHTML = '<i class="ti ti-heart"></i> ' + T.introPillVol;
+  if (pills[2]) pills[2].innerHTML = '<i class="ti ti-camera"></i> ' + T.introPillAct;
+  var ia = document.querySelectorAll('.intro-actions button, .intro-actions .btn-primary, .intro-actions .btn-secondary');
+  // find by icon
+  document.querySelectorAll('.btn-primary').forEach(function(b) {
+    if (b.innerHTML.includes('ti-user-plus')) b.innerHTML = '<i class="ti ti-user-plus"></i> ' + T.btnCreateAccount;
+  });
+  document.querySelectorAll('.btn-secondary').forEach(function(b) {
+    if (b.innerHTML.includes('ti-login')) b.innerHTML = '<i class="ti ti-login"></i> ' + T.btnSignIn;
+  });
+  var guestLink = document.querySelector('.intro-note a');
+  if (guestLink) guestLink.textContent = T.btnGuest;
+
+  // ── Auth screen ──
+  var tabL = document.getElementById('tabLogin');
+  if (tabL) tabL.textContent = T.tabLogin;
+  var tabS = document.getElementById('tabSignup');
+  if (tabS) tabS.textContent = T.tabSignup;
+
+  var lp = document.getElementById('loginPanel');
+  if (lp) {
+    var h2 = lp.querySelector('h2'); if (h2) h2.textContent = T.loginTitle;
+    var p = lp.querySelector('p'); if (p) p.textContent = T.loginSub;
+    var le = document.getElementById('loginEmail'); if (le) le.placeholder = T.emailPlaceholder;
+    var lpass = document.getElementById('loginPass'); if (lpass) lpass.placeholder = T.passPlaceholder;
+    var fp = lp.querySelector('a[onclick*="reset"]'); if (fp) fp.textContent = T.forgotPass;
+    var lb2 = lp.querySelector('.big-btn'); if (lb2) lb2.innerHTML = T.btnLogin + ' <i class="ti ti-arrow-right"></i>';
+    var dt = lp.querySelector('.divider-txt'); if (dt) dt.textContent = T.orContinueWith;
+    // social buttons
+    var sbtns = lp.querySelectorAll('.social-btn');
+    if (sbtns[0]) sbtns[0].innerHTML = '<i class="ti ti-brand-google" style="color:#4285F4"></i> Google';
+    if (sbtns[1]) sbtns[1].innerHTML = '<i class="ti ti-brand-apple"></i> Apple';
+    var asw = lp.querySelector('.auth-switch');
+    if (asw) asw.innerHTML = T.noAccount + ' <a onclick="switchAuthTab(\'signup\')">' + T.signUpLink + '</a>';
+    // field errors
+    var lee = document.getElementById('loginEmailErr'); if (lee) lee.textContent = T.errEmail;
+    var lpe = document.getElementById('loginPassErr'); if (lpe) lpe.textContent = T.errPass;
+  }
+
+  var sp = document.getElementById('signupPanel');
+  if (sp) {
+    var sh2 = sp.querySelector('h2'); if (sh2) sh2.textContent = T.signupTitle;
+    var spp = sp.querySelector('p'); if (spp) spp.textContent = T.signupSub;
+    // role cards
+    var rcs = document.getElementById('rc-seeker');
+    if (rcs) { rcs.querySelector('.rc-name').textContent = T.roleSeeker; rcs.querySelector('.rc-desc').textContent = T.roleSeekerDesc; }
+    var rce = document.getElementById('rc-employer');
+    if (rce) { rce.querySelector('.rc-name').textContent = T.roleEmployer; rce.querySelector('.rc-desc').textContent = T.roleEmployerDesc; }
+    var sn = document.getElementById('signupName'); if (sn) sn.placeholder = T.namePlaceholder;
+    var se = document.getElementById('signupEmail'); if (se) se.placeholder = T.emailPlaceholder;
+    var sps = document.getElementById('signupPass'); if (sps) sps.placeholder = T.passMinPlaceholder;
+    var sbtn = sp.querySelector('.big-btn'); if (sbtn) sbtn.innerHTML = T.btnCreateAcc + ' <i class="ti ti-arrow-right"></i>';
+    var sdt = sp.querySelector('.divider-txt'); if (sdt) sdt.textContent = T.orSignUpWith;
+    var ssbtns = sp.querySelectorAll('.social-btn');
+    if (ssbtns[0]) ssbtns[0].innerHTML = '<i class="ti ti-brand-google" style="color:#4285F4"></i> Google';
+    if (ssbtns[1]) ssbtns[1].innerHTML = '<i class="ti ti-brand-apple"></i> Apple';
+    var sasw = sp.querySelector('.auth-switch');
+    if (sasw) sasw.innerHTML = T.haveAccount + ' <a onclick="switchAuthTab(\'login\')">' + T.signInLink + '</a>';
+    var snee = document.getElementById('signupNameErr'); if (snee) snee.textContent = T.errName;
+    var see2 = document.getElementById('signupEmailErr'); if (see2) see2.textContent = T.errEmail;
+    var spe2 = document.getElementById('signupPassErr'); if (spe2) spe2.textContent = T.errPass8;
+  }
+
+  // ── Explore screen ──
+  var et = document.querySelector('.explore-title');
+  if (et) et.textContent = T.exploreTitle;
+  var esp = document.getElementById('exploreSearchInput');
+  if (esp) esp.placeholder = T.exploreSearchPh;
+  var catChips = document.querySelectorAll('.cat-chip');
+  var catKeys = ['catAll','catJobs','catVol','catAct','catFeat'];
+  var catIcons = ['ti-layout-grid','ti-briefcase','ti-heart','ti-camera','ti-star'];
+  catChips.forEach(function(chip, i) {
+    if (catKeys[i]) chip.innerHTML = '<i class="ti ' + catIcons[i] + '"></i> ' + T[catKeys[i]];
+  });
+  renderExplore();
+
+  // ── Profile screen ──
+  var pbs = document.querySelectorAll('.pf-b');
+  if (pbs[0]) pbs[0].textContent = T.badgeVerified;
+  if (pbs[1]) pbs[1].textContent = T.badgeVolHrs;
+  if (pbs[2]) pbs[2].textContent = T.badgeTopRated;
+  var peb = document.querySelector('.pf-edit-btn');
+  if (peb) peb.innerHTML = '<i class="ti ti-pencil" style="font-size:13px"></i> ' + T.editProfile;
+  var tbit = document.querySelector('.tbi-title');
+  if (tbit) tbit.textContent = T.trustHighly;
+  var tbis = document.querySelector('.tbi-sub');
+  if (tbis) tbis.textContent = T.trustBasedOn.replace('{n}', '18');
+  var sls = document.querySelectorAll('.stat-c .sl');
+  if (sls[0]) sls[0].textContent = T.statReviews;
+  if (sls[1]) sls[1].textContent = T.statVolHrs;
+  // section labels
+  document.querySelectorAll('.pf-slabel').forEach(function(el, i) {
+    var labels = [T.sectionCerts, T.sectionReviews, T.sectionSettings];
+    if (labels[i]) el.textContent = labels[i];
+  });
+  // settings items
+  var siLabels = document.querySelectorAll('.pf-si-label');
+  var siSubs = document.querySelectorAll('.pf-si-sub');
+  if (siLabels[0]) siLabels[0].textContent = T.settingsNotif;
+  if (siSubs[0]) siSubs[0].textContent = T.settingsNotifSub;
+  if (siLabels[1]) siLabels[1].textContent = T.settingsPrivacy;
+  if (siSubs[1]) siSubs[1].textContent = T.settingsPrivacySub;
+  if (siLabels[2]) { siLabels[2].textContent = T.settingsSignOut; siLabels[2].style.color = '#ff3b30'; }
+  if (siSubs[2]) siSubs[2].textContent = T.settingsSignOutSub;
+  // edit profile overlay
+  var ept = document.querySelector('.edit-sheet-title');
+  if (ept) ept.textContent = T.editProfileTitle;
+  var elf = document.querySelectorAll('.edit-label');
+  if (elf[0]) elf[0].textContent = T.editLabelName;
+  if (elf[1]) elf[1].textContent = T.editLabelCity;
+  var esb = document.querySelector('.edit-save-btn');
+  if (esb) esb.textContent = T.btnSaveChanges;
+  var ecb = document.querySelector('.edit-cancel-btn');
+  if (ecb) ecb.textContent = T.btnCancel;
+
+  // ── Alerts screen ──
+  var at = document.querySelector('.alerts-title');
+  if (at) at.textContent = T.alertsTitle;
+  var ama = document.querySelector('.alerts-mark-all');
+  if (ama) ama.textContent = T.markAllRead;
+
+  // ── Post screen ──
+  var ptt = document.querySelector('.post-title');
+  if (ptt) ptt.textContent = T.postTitle;
+  var pcancel = document.querySelector('#screen-post > .post-header > div:last-child');
+  if (pcancel && pcancel.getAttribute('onclick') && pcancel.getAttribute('onclick').includes('map')) pcancel.textContent = T.postCancel;
+  var pls = document.querySelectorAll('.post-label');
+  var plKeys = ['postTypeLabel','postTitleLabel','postOrgLabel','postLocLabel','postDescLabel','postPayLabel'];
+  pls.forEach(function(el, i) {
+    var req = el.querySelector('.req');
+    if (plKeys[i]) {
+      el.textContent = T[plKeys[i]] + ' ';
+      if (req && (i < 3 || i === 4)) { var rs = document.createElement('span'); rs.className='req'; rs.textContent='*'; el.appendChild(rs); }
+    }
+  });
+  var pti = document.getElementById('postTitle'); if (pti) pti.placeholder = T.postTitlePh;
+  var por = document.getElementById('postOrg'); if (por) por.placeholder = T.postOrgPh;
+  var plo = document.getElementById('postLocation'); if (plo) plo.placeholder = T.postLocPh;
+  var pde = document.getElementById('postDesc'); if (pde) pde.placeholder = T.postDescPh;
+  var ppa = document.getElementById('postPay'); if (ppa) ppa.placeholder = T.postPayPh;
+  var psub = document.querySelector('.post-submit'); if (psub) psub.innerHTML = '<i class="ti ti-send"></i> ' + T.btnPublish;
+  // post types
+  var ptypes = document.querySelectorAll('.post-type span');
+  if (ptypes[0]) ptypes[0].textContent = T.postTypeJob;
+  if (ptypes[1]) ptypes[1].textContent = T.postTypeVol;
+  if (ptypes[2]) ptypes[2].textContent = T.postTypeAct;
+  // success overlay in post
+  var pss = document.querySelector('#screen-post .success-title');
+  if (pss) pss.textContent = T.publishedTitle;
+  var psb = document.querySelector('#screen-post .success-sub');
+  if (psb) psb.textContent = T.publishedSub;
+  var psc = document.querySelector('#screen-post .success-close');
+  if (psc) psc.textContent = T.viewOnMap;
+
+  // ── Saved screen ──
+  var svt = document.querySelector('.saved-title');
+  if (svt) svt.textContent = T.savedTitle;
+  renderSavedScreen();
+}
+
+function toggleLang() {
+  var newLang = currentLang === 'hy' ? 'en' : 'hy';
+  applyLang(newLang);
+  showToast(newLang === 'en' ? 'Switched to English' : 'Փոխվեց հայերենի', 'ti-language', '#00c986');
+  loadGisPosts();
+}
+
+// ─── Patch saved screen to use translations ───
+var _origRenderSaved = renderSavedScreen;
+renderSavedScreen = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  var keys = Object.keys(savedItems);
+  var count = document.getElementById('savedCount');
+  var list = document.getElementById('savedList');
+  if (count) {
+    var n = keys.length;
+    count.textContent = n + ' ' + (currentLang === 'hy' ? 'պահված' : 'saved item' + (n !== 1 ? 's' : ''));
+  }
+  if (!list) return;
+  if (keys.length === 0) {
+    var lines = T.savedEmpty.split('\n');
+    list.innerHTML = '<div class="saved-empty"><i class="ti ti-bookmark"></i><p>' + lines[0] + '<br>' + (lines[1]||'') + '</p></div>';
+    return;
+  }
+  list.innerHTML = keys.map(function(id) {
+    var item = allListings.find(function(l) { return l.id === id; });
+    if (!item) return '';
+    return '<div class="saved-item" onclick="navigateTo(\'detail\',{id:\'' + id + '\'})">' +
+      '<div class="saved-item-icon" style="background:' + item.bg + '"><i class="ti ' + item.icon + '" style="color:' + item.color + '"></i></div>' +
+      '<div style="flex:1"><div class="saved-item-title">' + item.title + '</div><div class="saved-item-sub">' + item.org + '</div></div>' +
+      '<div class="saved-item-remove" onclick="event.stopPropagation();removeSaved(\'' + id + '\')"><i class="ti ti-x"></i></div>' +
+      '</div>';
+  }).join('');
+};
+
+// ─── Patch detail screen renderer to use translations ───
+var _origRenderDetail = renderDetailScreen;
+renderDetailScreen = function(id) {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  currentDetailId = id || 'l1';
+  var item = allListings.find(function(l) { return l.id === currentDetailId; }) || allListings[0];
+  var isSaved = !!savedItems[currentDetailId];
+  var el = document.getElementById('screen-detail');
+  el.scrollTop = 0;
+
+  document.getElementById('detail-content').innerHTML =
+    '<div class="detail-map-thumb">' +
+      '<div class="map-bg" style="opacity:.6"></div>' +
+      '<div class="map-road-h" style="top:45%;height:5px;opacity:.5;left:0;right:0"></div>' +
+      '<div class="map-road-v" style="left:50%;width:4px;opacity:.5"></div>' +
+      '<div class="my-ring" style="left:48%;top:60%"></div>' +
+      '<div class="my-dot" style="left:48%;top:60%"></div>' +
+      '<div class="map-pin" style="left:55%;top:35%">' +
+        '<div class="pin-dot" style="background:' + item.color + ';padding:6px 12px"><i class="ti ' + item.icon + '" style="font-size:12px;margin-right:3px"></i>' + item.company + '</div>' +
+        '<div class="pin-stem" style="background:' + item.color + '"></div>' +
+      '</div>' +
+      '<svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 360 220">' +
+        '<path d="M173 176 Q155 154 143 130 Q130 108 120 86 Q112 70 128 58" stroke="' + item.color + '" stroke-width="2.5" stroke-dasharray="5 4" fill="none" stroke-linecap="round"/>' +
+      '</svg>' +
+      '<div class="detail-back" onclick="goBack()"><i class="ti ti-chevron-left"></i></div>' +
+    '</div>' +
+    '<div class="detail-card">' +
+      '<div class="detail-chip" style="background:' + item.chipColor + ';color:' + item.chipTxt + '">' +
+        '<i class="ti ' + item.chipIcon + '" style="font-size:12px"></i>' + item.chip +
+      '</div>' +
+      '<div class="detail-title">' + item.title + '</div>' +
+      '<div class="detail-org">' + item.company + ' · ' + item.location + '</div>' +
+      '<div class="detail-meta-row">' +
+        '<div class="dmeta"><i class="ti ti-walk"></i><span>' + item.dist + ' ' + T.detailWalk + '</span></div>' +
+        '<div class="dmeta"><i class="ti ti-currency-dollar"></i><span>' + item.salary + '</span></div>' +
+        '<div class="dmeta"><i class="ti ti-star" style="color:var(--gold)"></i><span>4.9 · 24 ' + (currentLang==='hy'?'կարծիք':'reviews') + '</span></div>' +
+      '</div>' +
+      '<div class="detail-divider"></div>' +
+      '<div class="detail-section-label">' + T.detailEmployer + '</div>' +
+      '<div class="trust-row">' +
+        '<div class="trust-av"><i class="ti ti-building"></i></div>' +
+        '<div><div style="font-size:12px;color:var(--txt2);margin-bottom:1px">' + T.detailTrustLabel + '</div><div class="trust-score">96</div></div>' +
+        '<div class="trust-badge" style="margin-left:8px"><div class="tbadge tbadge-v">' + T.badgeVerified + '</div><div class="tbadge tbadge-b">Verified</div><div class="tbadge tbadge-v">32 ' + (currentLang==='hy'?'վարձ.':'hires') + '</div></div>' +
+      '</div>' +
+      '<div class="detail-divider"></div>' +
+      '<div class="detail-section-label">' + T.detailDesc + '</div>' +
+      '<div style="font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:16px;">' + item.desc + '</div>' +
+      '<div class="detail-divider"></div>' +
+      '<div class="detail-section-label">' + T.detailComments + ' <span style="color:var(--txt3);font-weight:400;" id="commentCountLabel">(' + commentCount + ')</span></div>' +
+      '<div class="comments-section">' +
+        '<div class="comment-input-row">' +
+          '<div class="comment-av-sm"><i class="ti ti-user"></i></div>' +
+          '<div class="comment-input-wrap">' +
+            '<textarea class="comment-inp" id="commentInput" placeholder="' + T.commentPh + '" maxlength="280"></textarea>' +
+            '<button class="comment-send-btn" onclick="postComment()"><i class="ti ti-send"></i></button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="commentsList">' +
+          '<div class="comment-item">' +
+            '<div class="ci-av"><i class="ti ti-user"></i></div>' +
+            '<div class="ci-body">' +
+              '<div class="ci-head"><span class="ci-name">Aram M.</span><span class="ci-time">' + (currentLang==='hy'?'2 ժամ առաջ':'2 hr ago') + '</span></div>' +
+              '<div class="ci-text">' + (currentLang==='hy'?'Հիանալի ընկերություն։ Ժամանակակից գրասենյակ և հաճելի թիմ։':'Great company to work for! Very modern office and nice team culture.') + '</div>' +
+              '<div class="ci-like" onclick="toggleLike(this)"><i class="ti ti-heart"></i><span>4</span></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="comment-item">' +
+            '<div class="ci-av" style="background:rgba(0,201,134,.15)"><i class="ti ti-user" style="color:#00c986"></i></div>' +
+            '<div class="ci-body">' +
+              '<div class="ci-head"><span class="ci-name">Nare K.</span><span class="ci-time">' + (currentLang==='hy'?'5 ժամ առաջ':'5 hr ago') + '</span></div>' +
+              '<div class="ci-text">' + (currentLang==='hy'?'Հարցազրույցի գործընթացը հստակ և մասնագիտական էր։':'Applied last week. The interview process was smooth and professional.') + '</div>' +
+              '<div class="ci-like" onclick="toggleLike(this)"><i class="ti ti-heart"></i><span>7</span></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="height:120px"></div>' +
+    '</div>' +
+    '<div class="apply-bar">' +
+      '<div class="apply-save" id="detailSaveBtn" onclick="toggleSave(this,\'' + item.id + '\')" style="' + (isSaved?'background:rgba(0,64,255,.2);border-color:rgba(0,64,255,.5);':'') + '">' +
+        '<i class="ti ' + (isSaved?'ti-bookmark-filled':'ti-bookmark') + '" style="' + (isSaved?'color:#4d7fff':'') + '"></i>' +
+      '</div>' +
+      '<div class="apply-btn" onclick="openApplyModal()"><i class="ti ti-send" style="font-size:16px;margin-right:8px"></i>' + T.btnQuickApply + '</div>' +
+    '</div>' +
+    '<div class="apply-modal" id="applyModal">' +
+      '<div class="apply-modal-inner">' +
+        '<div class="apply-modal-title">' + (currentLang==='hy'?'Դիմել ':'Apply to ') + item.company + '</div>' +
+        '<div class="apply-modal-sub">' + item.title + ' · ' + item.chip + '</div>' +
+        '<div class="apply-modal-field"><div class="apply-modal-label">' + T.applyModalSub + ' <span style="color:#ff3b30">*</span></div><textarea class="apply-modal-textarea" id="applyNote" placeholder="' + T.applyNotePh + '"></textarea></div>' +
+        '<div class="apply-modal-field"><div class="apply-modal-label">' + T.applyUrlLabel + '</div><input class="apply-modal-input" id="applyUrl" type="url" placeholder="' + T.applyUrlPh + '"></div>' +
+        '<button class="apply-modal-btn" onclick="submitApply()"><i class="ti ti-send"></i> ' + T.btnSendApp + '</button>' +
+        '<button class="apply-modal-cancel" onclick="closeApplyModal()">' + T.btnCancel + '</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="success-overlay" id="successOverlay">' +
+      '<div class="success-check"><i class="ti ti-check"></i></div>' +
+      '<div class="success-title">' + T.appliedTitle + '</div>' +
+      '<div class="success-sub">' + T.appliedSub.replace('{company}', item.company) + '</div>' +
+      '<div class="success-close" onclick="navigateTo(\'map\')">' + T.backToMap + '</div>' +
+    '</div>';
+};
+
+// ─── Patch explore label ───
+var _origRenderExplore = renderExplore;
+renderExplore = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  var list = document.getElementById('exploreList');
+  if (!list) return;
+  var allItems = allListings.concat(postedListings);
+  var items = allItems.filter(function(item) {
+    var matchType = currentFilter === 'all' || (currentFilter === 'featured' && item.featured) || (currentFilter === 'job' && item.type === 'job') || (currentFilter === 'vol' && item.type === 'vol') || (currentFilter === 'act' && item.type === 'act');
+    var matchSearch = !exploreSearchTerm || (item.title + item.org).toLowerCase().includes(exploreSearchTerm);
+    return matchType && matchSearch;
+  });
+  var label = document.getElementById('exploreLabel');
+  if (label) {
+    if (exploreSearchTerm) label.textContent = T.resultsFor.replace('{q}', exploreSearchTerm);
+    else if (currentFilter === 'featured') label.textContent = T.featured;
+    else label.textContent = T.nearYou;
+  }
+  if (items.length === 0) {
+    var lines = T.noResults.split('\n');
+    list.innerHTML = '<div class="no-results"><i class="ti ti-search-off"></i>' + lines[0] + '<br>' + (lines[1]||'') + '</div>';
+    return;
+  }
+  list.innerHTML = items.map(function(item) {
+    return '<div class="exp-card" onclick="navigateTo(\'detail\',{id:\'' + item.id + '\'})">' +
+      '<div class="exp-icon ' + (item.type==='job'?'j':item.type==='vol'?'v':'a') + '" style="background:' + item.bg + '"><i class="ti ' + item.icon + '" style="font-size:24px;color:' + item.color + '"></i></div>' +
+      '<div class="exp-info">' +
+        '<div class="exp-title">' + item.title + '</div>' +
+        '<div class="exp-sub">' + item.org + '</div>' +
+        '<div class="exp-tags">' + item.tags.map(function(tg) { return '<span class="exp-tag" style="background:' + item.bg + ';color:' + item.color + '">' + tg + '</span>'; }).join('') + '</div>' +
+      '</div>' +
+      '<div class="exp-right"><div class="exp-dist" style="color:' + item.color + '">' + item.dist + '</div><div class="exp-pay">' + item.pay + '</div></div>' +
+    '</div>';
+  }).join('');
+};
+
+// ─── Patch doLogin / doSignup / doLogout to use translated strings ───
+var _origDoLogin = doLogin;
+doLogin = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  var email = document.getElementById('loginEmail').value.trim();
+  var pass = document.getElementById('loginPass').value;
+  var ok = true;
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { showFieldErr('loginEmail','loginEmailErr'); ok = false; }
+  if (!pass) { showFieldErr('loginPass','loginPassErr'); ok = false; }
+  if (!ok) return;
+  showToast(T.signingIn,'ti-loader','#4d7fff');
+  setTimeout(function() { navigateTo('map'); }, 900);
+};
+var _origDoSignup = doSignup;
+doSignup = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  var name = document.getElementById('signupName').value.trim();
+  var email = document.getElementById('signupEmail').value.trim();
+  var pass = document.getElementById('signupPass').value;
+  var ok = true;
+  if (!name) { showFieldErr('signupName','signupNameErr'); ok = false; }
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { showFieldErr('signupEmail','signupEmailErr'); ok = false; }
+  if (!pass || pass.length < 8) { showFieldErr('signupPass','signupPassErr'); ok = false; }
+  if (!ok) return;
+  currentUser.name = name;
+  document.getElementById('pfName').textContent = name;
+  showToast(T.creatingAcc,'ti-loader','#4d7fff');
+  setTimeout(function() { navigateTo('map'); }, 900);
+};
+var _origDoLogout = doLogout;
+doLogout = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  showToast(T.signedOut,'ti-logout','#ff3b30');
+  setTimeout(function() { screenHistory = []; navigateTo('intro'); }, 900);
+};
+var _origSaveProfile = saveProfile;
+saveProfile = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  var name = document.getElementById('editName').value.trim();
+  var city = document.getElementById('editCity').value.trim();
+  if (!name) { showToast(T.nameEmpty,'ti-alert-circle','#ff6b00'); return; }
+  currentUser.name = name; currentUser.city = city;
+  document.getElementById('pfName').textContent = name;
+  document.getElementById('pfCity').textContent = city;
+  closeEditProfile();
+  showToast(T.profileUpdated,'ti-check','#00c986');
+};
+var _origMarkAllRead = markAllRead;
+markAllRead = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  document.querySelectorAll('.alert-item.unread').forEach(function(el) {
+    el.classList.remove('unread');
+    var dot = el.querySelector('.alert-dot'); if (dot) dot.remove();
+  });
+  unreadCount = 0; updateAlertBadge();
+  showToast(T.allRead,'ti-check','#00c986');
+};
+var _origSubmitApply = submitApply;
+submitApply = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  var note = document.getElementById('applyNote');
+  if (!note || !note.value.trim()) { showToast(T.addCoverNote,'ti-alert-circle','#ff6b00'); return; }
+  closeApplyModal();
+  var s = document.getElementById('successOverlay'); if (s) s.classList.add('show');
+};
+var _origSubmitPost = submitPost;
+submitPost = function() {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  var title = document.getElementById('postTitle').value.trim();
+  var org = document.getElementById('postOrg').value.trim();
+  var desc = document.getElementById('postDesc').value.trim();
+  var ok = true;
+  if (!title) { document.getElementById('postTitle').classList.add('perr'); ok = false; }
+  if (!org) { document.getElementById('postOrg').classList.add('perr'); ok = false; }
+  if (!desc) { document.getElementById('postDesc').classList.add('perr'); ok = false; }
+  if (!ok) { showToast(T.fillRequired,'ti-alert-circle','#ff6b00'); return; }
+  var newId = 'p' + Date.now();
+  var typeMap = { job:{icon:'ti-briefcase',color:'#4d7fff',bg:'rgba(0,64,255,.18)'}, vol:{icon:'ti-heart',color:'#00c986',bg:'rgba(0,201,134,.15)'}, act:{icon:'ti-camera',color:'#ff8c42',bg:'rgba(255,107,0,.15)'} };
+  var tp = typeMap[currentPostType];
+  var chipLabel = currentPostType==='job'?(currentLang==='hy'?'Աշխ.':'Job'):currentPostType==='vol'?(currentLang==='hy'?'Կամ.':'Volunteer'):(currentLang==='hy'?'Ակտ.':'Activity');
+  postedListings.push({ id:newId, type:currentPostType, icon:tp.icon, color:tp.color, bg:tp.bg, title, org, tags:[currentPostType==='job'?(currentLang==='hy'?'Նոր':'New'):(currentLang==='hy'?'Համայն.':'Community')], dist:'0 '+(currentLang==='hy'?'րոպե':'min'), pay: document.getElementById('postPay').value || 'TBD', featured:false, desc, salary: document.getElementById('postPay').value || 'TBD', company:org, location: document.getElementById('postLocation').value || 'Yerevan', chip:chipLabel, chipIcon:tp.icon, chipColor:tp.bg, chipTxt:tp.color });
+  var s = document.getElementById('postSuccess'); if (s) s.classList.add('show');
+};
+var _origRemoveSaved = removeSaved;
+removeSaved = function(id) {
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  delete savedItems[id];
+  showToast(T.removedSaved,'ti-trash','#ff6b00');
+  renderSavedScreen();
+};
+
+// ─── Patch loadGisPosts for current language ───
+var _origLoadGisPosts = loadGisPosts;
+loadGisPosts = async function() {
+  if (!window._supabaseClient) return;
+  var T = TRANSLATIONS[currentLang] || TRANSLATIONS['hy'];
+  const { data } = await window._supabaseClient.from('posts').select('*');
+  if (!data) return;
+
+  const filtered = data.filter(p => {
+    const okCat = gisFilter === 'all' || p.category === gisFilter;
+    const okSearch = !gisSearch || p.text?.toLowerCase().includes(gisSearch);
+    return okCat && okSearch;
+  }).map(p => {
+    const lng=Number(p.lng), lat=Number(p.lat);
+    if(isNaN(lng)||isNaN(lat)) return null;
+    const dist = (gisUserLat&&gisUserLng) ? getGisDist(gisUserLat,gisUserLng,lat,lng) : 9999;
+    return {...p, lng, lat, dist};
+  }).filter(Boolean).sort((a,b)=>a.dist-b.dist);
+
+  if (gisMap && gisMap.getSource('posts')) {
+    gisMap.getSource('posts').setData({
+      type: 'FeatureCollection',
+      features: filtered.map(p => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+        properties: { id: p.id, text: p.text, category: p.category }
+      }))
+    });
+  }
+
+  const list = document.getElementById('gis-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--txt3);font-size:13px;">' + T.noListings + '</div>';
+    return;
+  }
+  filtered.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'listing-row';
+    var catMap = {
+      'ներկում': {icon:'ti-brush', color:'#4d7fff', bg:'rgba(0,64,255,.18)', labelHy:'Ներկում', labelEn:'Painting'},
+      'մաքրում': {icon:'ti-leaf',  color:'#00c986', bg:'rgba(0,201,134,.15)', labelHy:'Մաքրում', labelEn:'Cleaning'},
+      'վարպետ': {icon:'ti-tools', color:'#ff8c42', bg:'rgba(255,107,0,.15)',  labelHy:'Վարպետ', labelEn:'Repair'},
+    };
+    var cm = catMap[p.category] || {icon:'ti-map-pin',color:'#999',bg:'rgba(150,150,150,.15)',labelHy:p.category,labelEn:p.category};
+    var catLabel = currentLang==='hy' ? cm.labelHy : cm.labelEn;
+    var distLabel = p.dist<9999 ? p.dist.toFixed(1)+' '+T.km : '—';
+    d.innerHTML = `
+      <div class="lr-icon" style="background:${cm.bg}"><i class="ti ${cm.icon}" style="font-size:18px;color:${cm.color}"></i></div>
+      <div><div class="lr-title">${p.text}</div><div class="lr-sub">${catLabel}</div></div>
+      <div class="lr-right"><div class="lr-dist" style="background:${cm.bg};color:${cm.color}">${distLabel}</div></div>
+    `;
+    d.onclick = () => { gisMap.flyTo({center:[p.lng,p.lat],zoom:15}); window._routeDest={lng:p.lng,lat:p.lat}; drawRoute(p.lng,p.lat, window._routeMode||'driving'); };
+    list.appendChild(d);
+  });
+};
+
+
+// ── Bottom sheet expand/collapse ──
+var _sheetExpanded = false;
+function toggleBottomSheet() {
+  _sheetExpanded = !_sheetExpanded;
+  var bs = document.querySelector('.bottom-sheet');
+  if (!bs) return;
+  if (_sheetExpanded) {
+    bs.style.transform = 'translateY(0)';
+    bs.style.maxHeight = '45%';
+  } else {
+    bs.style.transform = 'translateY(42%)';
+    bs.style.maxHeight = '28%';
+  }
+}
+</script>
+</body>
+</html>
